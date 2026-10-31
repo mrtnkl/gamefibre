@@ -1535,8 +1535,8 @@ class MainActivity : AppCompatActivity() {
             val last=layout?.findLastVisibleItemPosition()?.coerceAtLeast(first) ?: first
             val start=games.getOrNull(first)?.let { latestIndex[it.key] } ?: 0
             val end=games.getOrNull(last)?.let { latestIndex[it.key] } ?: start
-            return latest.subList((start-libraryColumns(list)*2).coerceAtLeast(0).coerceAtMost(latest.size),
-                (end+libraryColumns(list)*8).coerceAtMost(latest.size)).flatMap { it.copies.ifEmpty { listOf(it) } }.map { it.key }.toSet()
+            return libraryViewportRange(start, end, latest.size, libraryColumns(list))
+                .flatMap { latest[it].copies.ifEmpty { listOf(latest[it]) } }.map { it.key }.toSet()
         }
         fun promoteViewport() { if(collection.list==list)assetRepository.promote(viewportKeys()) }
         fun commitLatest() { submit(latest) }
@@ -2067,15 +2067,22 @@ class MainActivity : AppCompatActivity() {
         ui.gap(content, 16)
         ui.add(content, ui.button("Export backup (ZIP)") {
             dialog.dismiss()
-            act { exportCollection.launch("collection-${java.time.LocalDate.now()}.zip") }
+            act { exportCollection.launch(libraryExportFilename("zip")) }
         })
         ui.add(content, ui.button("Export spreadsheet (CSV)") {
             dialog.dismiss()
-            act { exportCollectionCsv.launch("collection-${java.time.LocalDate.now()}.csv") }
+            act { exportCollectionCsv.launch(libraryExportFilename("csv")) }
         })
         ui.gap(content, 12)
         ui.add(content, ui.text("CSV includes your current library, stores, progress, lists, playtime, and time to beat. Use ZIP to restore library metadata, settings, and custom cover URLs.", 13, ui.secondary))
         showModal(dialog)
+    }
+
+    private fun libraryExportFilename(extension: String): String {
+        val date = java.time.LocalDate.now()
+        val version = packageManager.getPackageInfo(packageName, 0).versionName
+        val monthDay = date.format(java.time.format.DateTimeFormatter.ofPattern("MM-dd", Locale.ROOT))
+        return "gamefibre-library-${date.year}-v$version-$monthDay.$extension"
     }
 
     private fun startCollectionTransfer(uri: Uri, format: String) {
