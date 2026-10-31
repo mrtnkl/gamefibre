@@ -922,7 +922,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun renderAuth() {
         val content = scrollColumn()
-        val card = ui.column(28).apply { background = ui.shape(Color.rgb(248,250,253), 24) }
+        val card = ui.column(28).apply { background = ui.shape(ui.surface, 24) }
         content.addView(card, LinearLayout.LayoutParams(ui.dp(440).coerceAtMost(resources.displayMetrics.widthPixels - ui.dp(40)), -2).apply { gravity = Gravity.CENTER_HORIZONTAL })
         val status = state.optString("status", "signedOut")
         if (status == "signedOut" && !state.optBoolean("sessionAvailable")) {
