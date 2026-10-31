@@ -1553,7 +1553,11 @@ class MainActivity : AppCompatActivity() {
             val recycler = retainedLibrary?.pages?.get(list)?.recycler
             if(collection.list!=list || recycler?.isAttachedToWindow!=true)recycler?.stopScroll()
             if (collection.list==list && recycler?.isAttachedToWindow==true && recycler.scrollState != RecyclerView.SCROLL_STATE_IDLE) return
-            val anchor = (recycler?.layoutManager as? GridLayoutManager)?.findFirstVisibleItemPosition()?.coerceAtLeast(0) ?: 0
+            val layout = recycler?.layoutManager as? ArtworkGridLayoutManager
+            val (position, offset) = layout?.publicationAnchor { first ->
+                games.getOrNull(first)?.key?.let { shown -> published.indexOfFirst { it.game.key == shown }.takeIf { it >= 0 } } ?: first
+            } ?: (0 to 0)
+            val anchor = position.coerceIn(0, (published.size - 1).coerceAtLeast(0))
             val range = (anchor - libraryColumns(list)*12).coerceAtLeast(0) until (anchor+libraryColumns(list)*16).coerceAtMost(published.size)
             if (published.isEmpty() && value.isNotEmpty()) {
                 ready = false
@@ -1565,6 +1569,8 @@ class MainActivity : AppCompatActivity() {
                 val scores = if (collection.sort == "Metascore") items.associate { it.key to mergedDetails(it).metascore } else emptyMap()
                 val diff = DiffUtil.calculateDiff(LibraryDiff(games, items, presentation != next || submitted.map { it.asset } != published.map { it.asset }, metascores, scores))
                 submitted = published; games = items; presentation = next; metascores = scores; ready = true
+                // Land on the prepared viewport rather than letting DiffUtil moves carry an old child off it.
+                layout?.scrollToPositionWithOffset(anchor, offset)
                 diff.dispatchUpdatesTo(this)
                 retainedLibrary?.updateReadiness()
             }

@@ -176,6 +176,52 @@ class ArtworkAuditInstrumentation:Instrumentation() {
         check(ui{auditFrames(activity)}.let{it.first>0 && it.second.isEmpty()})
         return "PASS native fling distance down/up ${measurements.joinToString()}; diagonal upward drag stayed in All games"
     }
+    private fun sorting(activity: Activity): String {
+        navigate(activity, "All games"); await(activity, "All games")
+        val collection = ui { field(activity, "collection") as CollectionData }
+        val savedSort = collection.sort
+        val savedDescending = collection.preferences.getBoolean("descending", false)
+        fun descendants(view: View): List<View> = listOf(view) +
+            if (view is android.view.ViewGroup) (0 until view.childCount).flatMap { descendants(view.getChildAt(it)) } else emptyList()
+        try {
+            for ((index, sort) in listOf("Name", "Playtime", "Random", "Metascore", "Time to beat", "Name").withIndex()) {
+                val list = ui { recycler(activity)!! }
+                ui { list.scrollToPosition(if (index % 2 == 0) 0 else list.adapter!!.itemCount / 2) }
+                SystemClock.sleep(350)
+                ui {
+                    activity.javaClass.getDeclaredMethod("showSortPicker").apply { isAccessible = true }.invoke(activity)
+                    val dialog = field(activity, "downloadDialog") as android.app.Dialog
+                    val views = descendants(dialog.window!!.decorView)
+                    (views.single { it is android.widget.RadioButton && it.text.toString() == sort } as android.widget.RadioButton).performClick()
+                    views.single { it.contentDescription == "Apply" }.performClick()
+                }
+                val deadline = SystemClock.elapsedRealtime() + 15_000
+                var committed = false
+                while (!committed && SystemClock.elapsedRealtime() < deadline) {
+                    SystemClock.sleep(100)
+                    committed = ui {
+                        val current = recycler(activity)!!
+                        val adapter = current.adapter!!
+                        @Suppress("UNCHECKED_CAST")
+                        val latest = (field(adapter, "latest") as List<LibraryEntry>).mapNotNull { AssetRepository.get(targetContext).published(it)?.game }
+                        val games = field(adapter, "games") as List<*>
+                        latest == games && auditFrames(activity).let { it.first > 0 && it.second.isEmpty() } &&
+                            (current.layoutManager as androidx.recyclerview.widget.GridLayoutManager).findFirstVisibleItemPosition() == 0
+                    }
+                }
+                check(committed) { "$sort did not commit prepared cards at the start of the list" }
+                sendStatus(0, Bundle().apply { putString("sort", "$sort passed") })
+            }
+            return "PASS: six sort changes from top and middle; prepared cards and scroll reset"
+        } finally {
+            ui {
+                collection.sort = savedSort
+                collection.preferences.edit().putBoolean("descending", savedDescending).apply()
+                activity.javaClass.getDeclaredField("descending").apply { isAccessible = true }.setBoolean(activity, savedDescending)
+                activity.javaClass.getDeclaredMethod("updateLibrary", Boolean::class.javaPrimitiveType).apply { isAccessible = true }.invoke(activity, true)
+            }
+        }
+    }
     override fun onStart() {
         val output=Bundle();var activity:Activity?=null;var listener:ViewTreeObserver.OnPreDrawListener?=null
         var frameCount=0;var cardFrames=0;val bad=mutableListOf<String>()
@@ -255,7 +301,8 @@ class ArtworkAuditInstrumentation:Instrumentation() {
                 waitForIdleSync()
                 val firstRequestCount=transport.requests.get()
                 if(mode=="scroll")output.putString("scroll",scrolling(screen))
-                val names=if(mode=="scroll")emptyList()else ui{pageNames(screen)}.filter{it in setOf("All games","Steam","GOG","Epic","Xbox")}
+                if(mode=="sort")output.putString("sort",sorting(screen))
+                val names=if(mode in setOf("scroll", "sort"))emptyList()else ui{pageNames(screen)}.filter{it in setOf("All games","Steam","GOG","Epic","Xbox")}
                 for(name in names) {
                     navigate(screen,name);await(screen,name)
                     sendStatus(0,Bundle().apply{putString("page", "$name ready")})
@@ -275,7 +322,7 @@ class ArtworkAuditInstrumentation:Instrumentation() {
                 check(transport.requests.get()==requests){"Offline navigation issued HTTP requests"}
                 val choices=ui{pageNames(screen)}
                 val start=choices.indexOf("GOG").coerceAtLeast(0)
-                if(start<choices.lastIndex) {
+                if(mode!="sort" && start<choices.lastIndex) {
                     navigate(screen,choices[start]);await(screen,choices[start])
                     val bounds=ui {val p=pager(screen)!!;val visible=Rect();check(p.getGlobalVisibleRect(visible));intArrayOf(visible.left,visible.top,visible.width(),visible.height())}
                     fun swipe(forward:Boolean) {

@@ -80,6 +80,12 @@ internal class ArtworkGridLayoutManager(context:Context,span:Int,
     private var requestedOffset=0
     init {isItemPrefetchEnabled=false}
     override fun supportsPredictiveItemAnimations()=false
+    /** Read the pending scroll before DiffUtil remaps the attached children's positions; otherwise follow the first visible child through [remap]. */
+    fun publicationAnchor(remap:(Int)->Int={it}):Pair<Int,Int> {
+        requestedPosition?.let { return it to requestedOffset }
+        val first=findFirstVisibleItemPosition().coerceAtLeast(0)
+        return remap(first) to (findViewByPosition(first)?.let { getDecoratedTop(it)-paddingTop } ?: 0)
+    }
     override fun calculateExtraLayoutSpace(state:RecyclerView.State,extraLayoutSpace:IntArray) {
         // The artwork look-ahead is independent of RecyclerView's offscreen view creation.
         extraLayoutSpace[0]=0;extraLayoutSpace[1]=0
