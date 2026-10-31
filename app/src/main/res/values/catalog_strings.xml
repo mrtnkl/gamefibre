@@ -1,0 +1,8 @@
+<resources>
+    <string name="catalog_page">%1$d / %2$d</string>
+    <string name="catalog_preparation">Artwork preparation (%1$d)</string>
+    <plurals name="catalog_matching_count">
+        <item quantity="one">%1$d matching game</item>
+        <item quantity="other">%1$d matching games</item>
+    </plurals>
+</resources>

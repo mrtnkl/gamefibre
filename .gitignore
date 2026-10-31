@@ -1,0 +1,50 @@
+# Gradle, Kotlin, and native build output
+.gradle/
+.kotlin/
+build/
+.externalNativeBuild/
+.cxx/
+
+# Local SDK and IDE settings
+local.properties
+local.properties.*
+.idea/
+.vscode/
+.fleet/
+*.iml
+.navigation/
+captures/
+.DS_Store
+
+# Packaged binaries, logs, and profiling output
+*.apk
+*.aab
+*.aar
+*.ap_
+*.dex
+*.class
+*.hprof
+*.log
+
+# Local credentials and release signing configuration
+key.properties
+keystore.properties
+*.jks
+*.keystore
+*.pem
+*.key
+*.p12
+*.pfx
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# The optional npm command runner has no dependencies
+node_modules/
+
+# Python tooling caches
+__pycache__/
+
+# Local release signing backup; never commit private keys or passwords
+.signing/

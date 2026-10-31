@@ -1,0 +1,22 @@
+<resources>
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorAccent">#0b57d0</item>
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowLightStatusBar">@bool/light_system_bars</item>
+        <item name="android:windowLightNavigationBar">@bool/light_system_bars</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowBackground">@color/app_background</item>
+    </style>
+    <style name="AppMaterialDialogTheme" parent="Theme.Material3.DayNight.Dialog.Alert">
+        <item name="colorPrimary">@color/app_primary</item>
+        <item name="colorOnPrimary">@color/app_on_primary</item>
+        <item name="colorSecondary">@color/app_primary</item>
+        <item name="colorAccent">@color/app_primary</item>
+        <item name="colorSurface">@color/app_background</item>
+        <item name="colorSurfaceContainerHigh">@color/app_surface</item>
+        <item name="colorOnSurface">@color/app_ink</item>
+        <item name="colorOnSurfaceVariant">@color/app_secondary_text</item>
+        <item name="android:fontFamily">@font/dm_sans</item>
+    </style>
+    <color name="ic_launcher_background">#FFFFFF</color>
+</resources>

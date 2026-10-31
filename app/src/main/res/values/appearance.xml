@@ -1,0 +1,9 @@
+<resources>
+    <color name="app_background">#ffffff</color>
+    <color name="app_primary">#0b57d0</color>
+    <color name="app_on_primary">#ffffff</color>
+    <color name="app_surface">#f0f4f9</color>
+    <color name="app_ink">#202124</color>
+    <color name="app_secondary_text">#5f6368</color>
+    <bool name="light_system_bars">true</bool>
+</resources>

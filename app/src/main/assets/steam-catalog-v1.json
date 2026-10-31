@@ -1,0 +1,14 @@
+{
+  "format_version": 1,
+  "source": "https://huggingface.co/datasets/FronkonGames/steam-games-dataset/resolve/6a31fcb42082345acc817e176b28849b7c05f248/games.json",
+  "source_revision": "6a31fcb42082345acc817e176b28849b7c05f248",
+  "source_sha256": "6c5c8f7c119c4f3f38cf82944d79ae6f3ca9a433ce39685a9a98393108b50ef8",
+  "source_license": "MIT",
+  "games": 144498,
+  "with_metascore": 4282,
+  "with_release_date": 144498,
+  "with_reviews": 82988,
+  "uncompressed_bytes": 3869691,
+  "compressed_bytes": 1783592,
+  "index_sha256": "f9ebc3c0e8b1094926cb48f9e9031ca4ce299f9f59392c137dbfd5b9f23b170f"
+}

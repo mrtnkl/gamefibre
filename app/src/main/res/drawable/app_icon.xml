@@ -1,0 +1,20 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- Center the full stack inside the adaptive icon's safe area. -->
+    <group android:translateX="20.475" android:translateY="18.9375"
+        android:scaleX="0.055" android:scaleY="0.055">
+        <path android:fillColor="@android:color/transparent"
+            android:strokeColor="#0D6EFD" android:strokeWidth="52"
+            android:strokeLineCap="round" android:strokeLineJoin="round"
+            android:pathData="M312,465 L269,483 C214,505 191,555 214,611 L357,989 C375,1036 425,1069 478,1052 L752,956 C780,946 800,929 812,910" />
+        <path android:fillColor="@android:color/transparent"
+            android:strokeColor="#0D6EFD" android:strokeWidth="52"
+            android:strokeLineCap="round" android:strokeLineJoin="round"
+            android:pathData="M446,334 L418,339 C350,351 305,397 320,467 L393,861 C403,922 447,969 511,956 L837,901 C874,895 910,871 921,833" />
+        <path android:fillColor="@android:color/transparent"
+            android:strokeColor="#0D6EFD" android:strokeWidth="52"
+            android:strokeLineJoin="round"
+            android:pathData="M567,218 L893,218 C959,218 1012,271 1012,337 L1012,717 C1012,783 959,836 893,836 L567,836 C501,836 448,783 448,717 L448,337 C448,271 501,218 567,218 Z" />
+    </group>
+</vector>

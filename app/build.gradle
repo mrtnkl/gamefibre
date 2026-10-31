@@ -1,0 +1,90 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+def appVersion = new Properties()
+rootProject.file('version.properties').withInputStream { appVersion.load(it) }
+
+def signingEnvironment = ['ANDROID_KEYSTORE_PATH', 'ANDROID_KEYSTORE_PASSWORD',
+                          'ANDROID_KEY_ALIAS', 'ANDROID_KEY_PASSWORD']
+def hasReleaseSigning = signingEnvironment.every { System.getenv(it) }
+
+android {
+    namespace 'com.gamefibre'
+    compileSdk 36
+    defaultConfig {
+        applicationId 'com.gamefibre'
+        minSdk 29
+        targetSdk 36
+        versionCode appVersion.getProperty('versionCode').toInteger()
+        versionName appVersion.getProperty('versionName')
+        testInstrumentationRunner 'com.gamefibre.ArtworkAuditInstrumentation'
+    }
+    signingConfigs {
+        release {
+            if (hasReleaseSigning) {
+                storeFile file(System.getenv('ANDROID_KEYSTORE_PATH'))
+                storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('ANDROID_KEY_ALIAS')
+                keyPassword System.getenv('ANDROID_KEY_PASSWORD')
+            }
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+        coreLibraryDesugaringEnabled true
+    }
+    kotlinOptions { jvmTarget = '21' }
+    testOptions { unitTests { includeAndroidResources = true } }
+    androidResources {
+        // Generator inputs and provenance notes stay in the tree for scripts/tests; the app reads only the built indexes.
+        ignoreAssetsPatterns.addAll(['hltb-min.csv', 'hltb-names.tsv', 'HLTB-SOURCE.md', 'STEAM-TITLES-SOURCE.md', 'STEAM-TAGS-SOURCE.md', 'STEAM-CATALOG-SOURCE.md'])
+    }
+    lint {
+        // Existing findings live in the baseline; anything new fails the build.
+        baseline = file('lint-baseline.xml')
+        warningsAsErrors = true
+        abortOnError = true
+    }
+    packaging { resources { excludes += ['META-INF/INDEX.LIST', 'META-INF/DEPENDENCIES']; merges += ['META-INF/LICENSE*', 'META-INF/NOTICE*'] } }
+}
+
+// Validate only when a release is built; debug builds and IDE sync need no secrets.
+tasks.configureEach {
+    if (name == 'preReleaseBuild') {
+        doFirst {
+            if (!hasReleaseSigning) {
+                throw new GradleException('Release signing is required. Set: ' +
+                    signingEnvironment.join(', ') + '. See README.md for release instructions.')
+            }
+        }
+    }
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.json:json:20240303'
+    testImplementation 'org.robolectric:robolectric:4.16'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0'
+    implementation 'androidx.viewpager2:viewpager2:1.1.0'
+    implementation 'com.google.android.material:material:1.13.0'
+    implementation 'com.google.zxing:core:3.5.3'
+    implementation 'in.dragonbra:javasteam:1.8.0'
+    implementation 'in.dragonbra:javasteam-depotdownloader:1.8.0'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.83'
+    implementation 'org.tukaani:xz:1.10'
+    implementation 'com.github.luben:zstd-jni:1.5.7-6@aar'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.10.2'
+    implementation 'com.google.protobuf:protobuf-java:4.33.2'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+}

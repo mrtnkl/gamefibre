@@ -1,0 +1,1337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.13.0" type="baseline" client="gradle" dependencies="false" name="AGP (8.13.0)" variant="all" version="8.13.0">
+
+    <issue
+        id="ApplySharedPref"
+        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
+        errorLine1="            undo.commit()"
+        errorLine2="                 ~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/SteamGridDb.kt"
+            line="99"
+            column="18"/>
+    </issue>
+
+
+    <issue
+        id="UseCompatLoadingForDrawables"
+        message="Use `AppCompatResources.getDrawable()`"
+        errorLine1="            val check = if (isChecked) context.getDrawable(R.drawable.ic_check)?.mutate()?.apply { setTint(blue) }"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/NativeUi.kt"
+            line="78"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="UseCompatLoadingForDrawables"
+        message="Use `AppCompatResources.getDrawable()`"
+        errorLine1="                    val arrow = context.getDrawable(R.drawable.ic_arrow_down)?.apply { setBounds(0, 0, dp(16), dp(16)) }"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/NativeUi.kt"
+            line="111"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="UseCompatLoadingForDrawables"
+        message="Use `AppCompatResources.getDrawable()`"
+        errorLine1="                    val arrow = context.getDrawable(R.drawable.ic_arrow_down)?.apply { setBounds(0, 0, dp(16), dp(16)) }"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/NativeUi.kt"
+            line="111"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="UseCompatTextViewDrawableApis"
+        message="Use `TextViewCompat.setCompoundDrawableTintList()`"
+        errorLine1="                compoundDrawableTintList = android.content.res.ColorStateList.valueOf(ui.blue)"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/MainActivity.kt"
+            line="2765"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="NotifyDataSetChanged"
+        message="It will always be more efficient to use more specific change events if you can. Rely on `notifyDataSetChanged` as a last resort."
+        errorLine1="        rows.notifyDataSetChanged()"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/ListOrderView.kt"
+            line="58"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NotifyDataSetChanged"
+        message="It will always be more efficient to use more specific change events if you can. Rely on `notifyDataSetChanged` as a last resort."
+        errorLine1="            screen.pager.adapter?.notifyDataSetChanged()"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/MainActivity.kt"
+            line="1098"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NotifyDataSetChanged"
+        message="It will always be more efficient to use more specific change events if you can. Rely on `notifyDataSetChanged` as a last resort."
+        errorLine1="            notifyDataSetChanged()"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/SteamGridDbDialog.kt"
+            line="207"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="NotifyDataSetChanged"
+        message="It will always be more efficient to use more specific change events if you can. Rely on `notifyDataSetChanged` as a last resort."
+        errorLine1="                pages.notifyDataSetChanged()"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/YouTubeVideos.kt"
+            line="141"
+            column="17"/>
+    </issue>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <issue
+        id="UsableSpace"
+        message="Consider also using `StorageManager#getAllocatableBytes` and `allocateBytes` which will consider clearable cached data"
+        errorLine1="            if (total > 0) check(target.parentFile!!.usableSpace >= total - offset) { &quot;Not enough free space for the GOG Linux installer.&quot; }"
+        errorLine2="                                                     ~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/stores/DownloadIo.kt"
+            line="84"
+            column="54"/>
+    </issue>
+
+    <issue
+        id="UsableSpace"
+        message="Consider also using `StorageManager#getAllocatableBytes` and `allocateBytes` which will consider clearable cached data"
+        errorLine1="            check(directory.usableSpace>=Math.addExact((total-existing).coerceAtLeast(0),total)) { &quot;Not enough space to extract and export the Linux game files.&quot; }"
+        errorLine2="                            ~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/stores/GogLinuxPayload.kt"
+            line="30"
+            column="29"/>
+    </issue>
+
+    <issue
+        id="UsableSpace"
+        message="Consider also using `StorageManager#getAllocatableBytes` and `allocateBytes` which will consider clearable cached data"
+        errorLine1="        check(directory.usableSpace >= needed) { &quot;Not enough free space for the game files and their export.&quot; }"
+        errorLine2="                        ~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/stores/StorePayload.kt"
+            line="36"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="ViewConstructor"
+        message="Custom view `DialogActions` is missing constructor used by tools: `(Context)` or `(Context,AttributeSet)` or `(Context,AttributeSet,int)`"
+        errorLine1="private class DialogActions(context: Context, private val ui: NativeUi) : LinearLayout(context) {"
+        errorLine2="              ~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/ContentDialog.kt"
+            line="63"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="ViewConstructor"
+        message="Custom view `ScreenshotDots` is missing constructor used by tools: `(Context)` or `(Context,AttributeSet)` or `(Context,AttributeSet,int)`"
+        errorLine1="internal class ScreenshotDots(context: Context, private val count: Int, private val imageLabel: String = &quot;Screenshot&quot;,"
+        errorLine2="               ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/FullscreenScreenshots.kt"
+            line="92"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="ViewConstructor"
+        message="Custom view `ZoomScreenshotView` is missing constructor used by tools: `(Context)` or `(Context,AttributeSet)` or `(Context,AttributeSet,int)`"
+        errorLine1="internal class ZoomScreenshotView(context: Context, private val zoomChanged: (Boolean) -> Unit, private val tapped: (Boolean) -> Unit,"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/FullscreenScreenshots.kt"
+            line="113"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="ViewConstructor"
+        message="Custom view `GamePageScrollView` is missing constructor used by tools: `(Context)` or `(Context,AttributeSet)` or `(Context,AttributeSet,int)`"
+        errorLine1="internal class GamePageScrollView(context: Context, private val closePage: () -> Unit,"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/GamePageScrollView.kt"
+            line="18"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="ViewConstructor"
+        message="Custom view `LibraryGestureHost` is missing constructor used by tools: `(Context)` or `(Context,AttributeSet)` or `(Context,AttributeSet,int)`"
+        errorLine1="internal class LibraryGestureHost(context:Context,private val vertical:(Boolean)->Unit):FrameLayout(context) {"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/LibraryGestureHost.kt"
+            line="10"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="ViewConstructor"
+        message="Custom view `LibraryListBar` is missing constructor used by tools: `(Context)` or `(Context,AttributeSet)` or `(Context,AttributeSet,int)`"
+        errorLine1="internal class LibraryListBar(context: Context, color: Int, private val radius: Float) : LinearLayout(context) {"
+        errorLine2="               ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/LibraryListBar.kt"
+            line="13"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="ViewConstructor"
+        message="Custom view `ListOrderView` is missing constructor used by tools: `(Context)` or `(Context,AttributeSet)` or `(Context,AttributeSet,int)`"
+        errorLine1="internal class ListOrderView("
+        errorLine2="               ~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/ListOrderView.kt"
+            line="17"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="ViewConstructor"
+        message="Custom view `ScreenshotCarousel` is missing constructor used by tools: `(Context)` or `(Context,AttributeSet)` or `(Context,AttributeSet,int)`"
+        errorLine1="internal class ScreenshotCarousel(context: Context, parent: CoroutineScope, private val urls: List&lt;String>,"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/ScreenshotCarousel.kt"
+            line="22"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="ViewConstructor"
+        message="Custom view `YouTubeVideos` is missing constructor used by tools: `(Context)` or `(Context,AttributeSet)` or `(Context,AttributeSet,int)`"
+        errorLine1="internal class YouTubeVideos(private val activity: AppCompatActivity, parent: CoroutineScope,"
+        errorLine2="               ~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/YouTubeVideos.kt"
+            line="40"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="    fun mark(store: String) { check(preferences.edit().putBoolean(store, true).commit()) { &quot;Could not schedule account cleanup.&quot; } }"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/AccountCleanup.kt"
+            line="9"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="    fun complete(store: String) { check(preferences.edit().remove(store).commit()) { &quot;Could not finish account cleanup.&quot; } }"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/AccountCleanup.kt"
+            line="10"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `Bitmap.scale` instead?"
+        errorLine1="        val bitmap=if(ratio==1.0)raw else Bitmap.createScaledBitmap(raw,(raw.width*ratio).toInt().coerceAtLeast(1),(raw.height*ratio).toInt().coerceAtLeast(1),true).also {raw.recycle()}"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/assets/AssetRepository.kt"
+            line="196"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="            val source=Uri.parse(uri.toString());val builder=source.buildUpon().clearQuery()"
+        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/assets/AssetTransport.kt"
+            line="41"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `Bitmap.scale` instead?"
+        errorLine1="                                    val bitmap=if(ratio==1.0)decoded else Bitmap.createScaledBitmap(decoded,(decoded.width*ratio).toInt().coerceAtLeast(1),(decoded.height*ratio).toInt().coerceAtLeast(1),true)"
+        errorLine2="                                                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/assets/AssetTransport.kt"
+            line="102"
+            column="75"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension property `View.isGone` instead?"
+        errorLine1="            if (child.visibility == GONE) continue"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CenteredChipGroup.kt"
+            line="22"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        val editor = preferences.edit()"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="16"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { preferences.edit().putString(&quot;list&quot;, value).apply() }"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="44"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { preferences.edit().putBoolean(&quot;titles&quot;, value).apply() }"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="47"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { preferences.edit().putBoolean(&quot;fit-cover-art&quot;, value).apply() }"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="50"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { preferences.edit().putBoolean(&quot;show-hidden-games&quot;, value).apply() }"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="53"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { preferences.edit().putBoolean(&quot;show-game-pass&quot;, value).apply() }"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="56"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { preferences.edit().putString(&quot;tiles&quot;, value).apply() }"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="59"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { preferences.edit().putString(&quot;sort&quot;, value).apply() }"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="62"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        set(value) { preferences.edit().putLong(&quot;random-sort-seed&quot;, value).apply() }"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="65"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        check(preferences.edit().putString(&quot;list-order&quot;, JSONArray(order).toString()).commit()) { &quot;Could not save list order.&quot; }"
+        errorLine2="              ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="86"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        val editor = preferences.edit()"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="94"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        preferences.edit()"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="107"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        val editor = preferences.edit()"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="132"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        val editor = preferences.edit().putString(&quot;wishlist-items&quot;, JSONArray(mergedWishlist.map(WishlistItems::json)).toString())"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="156"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="            val editor = preferences.edit()"
+        errorLine2="                         ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="212"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="            val editor = preferences.edit()"
+        errorLine2="                         ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="226"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        preferences.edit().putStringSet(&quot;members:$list&quot;, if (key in members) members - key else members + key).apply()"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="236"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        preferences.edit().putStringSet(&quot;members:$list&quot;, if (included) members + keys else members - keys).apply()"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="241"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        check(preferences.edit().putString(&quot;wishlist-items&quot;, data.toString())"
+        errorLine2="              ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="261"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        preferences.edit().putString(&quot;download:${game.key}&quot;, data)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="283"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        preferences.edit().remove(&quot;download:$key&quot;).putStringSet(&quot;download-keys&quot;,"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/CollectionData.kt"
+            line="291"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="                try { context.contentResolver.delete(Uri.parse(line), null, null) } catch (_: Exception) { failed.add(line) }"
+        errorLine2="                                                     ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/steam/DownloadsExporter.kt"
+            line="29"
+            column="54"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="        GOG -> Uri.parse(&quot;https://login.gog.com/auth&quot;).buildUpon()"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/stores/GameStore.kt"
+            line="11"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="        EPIC -> Uri.parse(&quot;https://www.epicgames.com/id/login&quot;).buildUpon()"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/stores/GameStore.kt"
+            line="14"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="                val uri = Uri.parse(text)"
+        errorLine2="                          ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/stores/GameStore.kt"
+            line="24"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `ViewGroup.isEmpty` instead?"
+        errorLine1="        if (childCount == 0) return false"
+        errorLine2="            ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/LibraryListBar.kt"
+            line="55"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension property `View.isVisible` instead?"
+        errorLine1="            if (libraryPageHint.visibility == View.VISIBLE &amp;&amp; libraryListBarVisible()) hideLibraryPageHint()"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/MainActivity.kt"
+            line="434"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `ViewGroup.isEmpty` instead?"
+        errorLine1="        if (header.childCount == 0 || header.tag != &quot;$tab:$steamSignIn:${collection.list}&quot; || force) renderHeader()"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/MainActivity.kt"
+            line="504"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="            collection.preferences.edit().putBoolean(&quot;descending&quot;, descending).apply()"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/MainActivity.kt"
+            line="1772"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="                    collection.preferences.edit().putString(&quot;theme&quot;, value).apply()"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/MainActivity.kt"
+            line="1867"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="        act { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(address))) }"
+        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/MainActivity.kt"
+            line="2066"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="                            act { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(direct ?: storeSearchUrl(store, game.name)))) }"
+        errorLine2="                                                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/MainActivity.kt"
+            line="2514"
+            column="76"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        preferences.edit().putLong(&quot;generation&quot;, preferences.getLong(&quot;generation&quot;, 0L) + 1L).apply()"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/PageDetailsRepository.kt"
+            line="25"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `ViewGroup.isNotEmpty` instead?"
+        errorLine1="        if (content.childCount > 0) ui.gap(content, 24)"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/SettingsScreen.kt"
+            line="12"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        val editor = prefs.edit()"
+        errorLine2="                     ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/SteamGridDb.kt"
+            line="92"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="            val undo = prefs.edit().clear()"
+        errorLine2="                       ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/SteamGridDb.kt"
+            line="97"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        val edit = prefs.edit(); keys.forEach { edit.putString(it, address) }"
+        errorLine2="                   ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/SteamGridDb.kt"
+            line="112"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        val edit = prefs.edit(); keys.forEach(edit::remove)"
+        errorLine2="                   ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/SteamGridDb.kt"
+            line="117"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        check(prefs.edit().clear().putString(&quot;iv&quot;, Base64.encodeToString(cipher.iv, Base64.NO_WRAP))"
+        errorLine2="              ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/SteamGridDbKeyVault.kt"
+            line="28"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="    @Synchronized fun clear() { check(prefs.edit().clear().commit()) { &quot;Could not forget the API key.&quot; } }"
+        errorLine2="                                      ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/SteamGridDbKeyVault.kt"
+            line="40"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="            val url = Uri.parse(&quot;$EPIC_LIBRARY/library/api/public/items&quot;).buildUpon().appendQueryParameter(&quot;includeMetadata&quot;, &quot;true&quot;)"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/stores/StoreApi.kt"
+            line="99"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="                        val url = Uri.parse(&quot;$EPIC_CATALOG/catalog/api/shared/namespace/${Uri.encode(namespace)}/bulk/items&quot;).buildUpon()"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/stores/StoreApi.kt"
+            line="125"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="        val urls=manifests.map { manifest -> val b=Uri.parse(manifest.getString(&quot;uri&quot;)).buildUpon()"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/stores/StorePayloads.kt"
+            line="38"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="        val b=Uri.parse(&quot;$GOG_CONTENT/products/${Uri.encode(product)}/secure_link&quot;).buildUpon().appendQueryParameter(&quot;_version&quot;,&quot;2&quot;)"
+        errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/stores/StorePayloads.kt"
+            line="65"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="            val uri=Uri.parse(downlink); check(uri.scheme==&quot;https&quot; &amp;&amp; uri.host in listOf(&quot;api.gog.com&quot;,&quot;content-system.gog.com&quot;,&quot;embed.gog.com&quot;))"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/stores/StorePayloads.kt"
+            line="77"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        check(prefs.edit().clear().putString(&quot;iv&quot;, Base64.encodeToString(cipher.iv, Base64.NO_WRAP))"
+        errorLine2="              ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/stores/StoreTokenVault.kt"
+            line="30"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="    @Synchronized fun invalidate() { check(prefs.edit().putBoolean(&quot;rejected&quot;, true).commit()) { &quot;Could not update the account session.&quot; } }"
+        errorLine2="                                           ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/stores/StoreTokenVault.kt"
+            line="35"
+            column="44"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="    @Synchronized fun clear() { check(prefs.edit().clear().commit()) { &quot;Could not forget the account session.&quot; } }"
+        errorLine2="                                      ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/stores/StoreTokenVault.kt"
+            line="46"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        check(prefs.edit().clear().putString(&quot;iv&quot;, Base64.encodeToString(cipher.iv, Base64.NO_WRAP))"
+        errorLine2="              ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/steam/TokenVault.kt"
+            line="30"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        check(prefs.edit().putBoolean(&quot;rejected&quot;, true).commit()) { &quot;Cannot update Steam session&quot; }"
+        errorLine2="              ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/steam/TokenVault.kt"
+            line="38"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="    @Synchronized fun clear() { check(prefs.edit().clear().commit()) { &quot;Cannot forget Steam session&quot; } }"
+        errorLine2="                                      ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/steam/TokenVault.kt"
+            line="52"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="                    if (receive(Uri.parse(url))) view.stopLoading()"
+        errorLine2="                                ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/XboxLoginActivity.kt"
+            line="86"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="                    if (receive(Uri.parse(url))) view.stopLoading()"
+        errorLine2="                                ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/XboxLoginActivity.kt"
+            line="86"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `String.toUri` instead?"
+        errorLine1="            view.loadUrl(Uri.parse(GameStore.XBOX.loginUrl).buildUpon().appendQueryParameter(&quot;state&quot;, state).build().toString())"
+        errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/XboxLoginActivity.kt"
+            line="100"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        errorLine1="        preferences.edit().putString(YouTubeQueries.PREFERENCE, queries.joinToString(&quot;\n&quot;)).apply()"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/YouTubeSettings.kt"
+            line="72"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="            summary.text = &quot;${state.results.size} of ${state.total} processed&quot;"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/BatchArtworkDialog.kt"
+            line="31"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="            summary.text = &quot;${state.results.size} of ${state.total} processed&quot;"
+        errorLine2="                                                 ~~~~">
+        <location
+            file="src/main/java/com/gamefibre/BatchArtworkDialog.kt"
+            line="31"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="            summary.text = &quot;${state.results.size} of ${state.total} processed&quot;"
+        errorLine2="                                                                   ~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/BatchArtworkDialog.kt"
+            line="31"
+            column="68"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
+        errorLine1="            text = count.toString()"
+        errorLine2="                   ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/MainActivity.kt"
+            line="1073"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="            text = &quot;${attention.joinToString(&quot;, &quot;)} needs attention · Open Accounts&quot;"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/MainActivity.kt"
+            line="1121"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="            text = &quot;${attention.joinToString(&quot;, &quot;)} needs attention · Open Accounts&quot;"
+        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/MainActivity.kt"
+            line="1121"
+            column="52"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
+        errorLine1="                text = selectedLibraryKeys.size.toString()"
+        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/MainActivity.kt"
+            line="1223"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="                (progressButton.getChildAt(0) as TextView).text = &quot;Progress: ${selectedProgress?.label ?: &quot;Keep current&quot;}&quot;"
+        errorLine2="                                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/MainActivity.kt"
+            line="1299"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="                (progressButton.getChildAt(0) as TextView).text = &quot;Progress: ${selectedProgress?.label ?: &quot;Keep current&quot;}&quot;"
+        errorLine2="                                                                   ~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/MainActivity.kt"
+            line="1299"
+            column="68"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
+        errorLine1="            holder.metascoreBadge.text = metascore?.toString().orEmpty()"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/MainActivity.kt"
+            line="1476"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="            destination.text = &quot;Downloads / ${game.name}${if (selectedFormat() == &quot;zip&quot;) &quot;.zip&quot; else &quot; /&quot;}&quot;"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/MainActivity.kt"
+            line="2773"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="            destination.text = &quot;Downloads / ${game.name}${if (selectedFormat() == &quot;zip&quot;) &quot;.zip&quot; else &quot; /&quot;}&quot;"
+        errorLine2="                                ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/MainActivity.kt"
+            line="2773"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="        status.text = &quot;Selected cover #${it.id}${if (it.author.isBlank()) &quot;&quot; else &quot; by ${it.author}&quot;}&quot;"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/SteamGridDbDialog.kt"
+            line="90"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="        status.text = &quot;Selected cover #${it.id}${if (it.author.isBlank()) &quot;&quot; else &quot; by ${it.author}&quot;}&quot;"
+        errorLine2="                       ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/SteamGridDbDialog.kt"
+            line="90"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="        if (title.isBlank()) { status.text = &quot;Enter a game title.&quot;; return }"
+        errorLine2="                                              ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/SteamGridDbDialog.kt"
+            line="104"
+            column="47"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="        status.text = &quot;Searching SteamGridDB…&quot;"
+        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/SteamGridDbDialog.kt"
+            line="105"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="        status.text = &quot;Loading covers…&quot;"
+        errorLine2="                       ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/SteamGridDbDialog.kt"
+            line="138"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="            status.text = &quot;Clearing…&quot;"
+        errorLine2="                           ~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/StorageDialog.kt"
+            line="36"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="            catch (_: Exception) { status.text = &quot;Could not finish cleanup. Wait for downloads and account cleanup to stop, then try again.&quot; }"
+        errorLine2="                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/StorageDialog.kt"
+            line="43"
+            column="51"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="            status.text = &quot;Complete sign-in below. This window closes automatically when your account is ready to connect.&quot;"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/StoreLoginActivity.kt"
+            line="53"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="        if (text.length &lt; 2) { status.text = &quot;Enter at least two characters.&quot;; return }"
+        errorLine2="                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/WishlistDialog.kt"
+            line="46"
+            column="47"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="        status.text = &quot;Searching ${source.label}…&quot;"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/WishlistDialog.kt"
+            line="48"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="        status.text = &quot;Searching ${source.label}…&quot;"
+        errorLine2="                       ~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/WishlistDialog.kt"
+            line="48"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="                        this.text = &quot;Add&quot;; textSize = 14f; typeface = ui.font; setTextColor(ui.blue)"
+        errorLine2="                                     ~~~">
+        <location
+            file="src/main/java/com/gamefibre/WishlistDialog.kt"
+            line="74"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="                                    if (contains(game.key)) { remove(game); status.text = &quot;Removed ${game.name}.&quot; }"
+        errorLine2="                                                                                          ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/WishlistDialog.kt"
+            line="90"
+            column="91"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="                                    if (contains(game.key)) { remove(game); status.text = &quot;Removed ${game.name}.&quot; }"
+        errorLine2="                                                                                           ~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/WishlistDialog.kt"
+            line="90"
+            column="92"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="                                        ensureActive(); add(full); status.text = &quot;Added ${game.name}.&quot;"
+        errorLine2="                                                                                 ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/WishlistDialog.kt"
+            line="93"
+            column="82"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="                                        ensureActive(); add(full); status.text = &quot;Added ${game.name}.&quot;"
+        errorLine2="                                                                                  ~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/WishlistDialog.kt"
+            line="93"
+            column="83"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="                if (missingArt > 0) status.text = &quot;$missingArt matches could not prepare artwork. Try again when connected.&quot;"
+        errorLine2="                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/WishlistDialog.kt"
+            line="104"
+            column="51"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="                if (missingArt > 0) status.text = &quot;$missingArt matches could not prepare artwork. Try again when connected.&quot;"
+        errorLine2="                                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/WishlistDialog.kt"
+            line="104"
+            column="63"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="            status.text = &quot;Added $added ${if (added == 1) &quot;game&quot; else &quot;games&quot;}. ${result.games.size - added} already on your wishlist.&quot; +"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/WishlistDialog.kt"
+            line="150"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="            status.text = &quot;Added $added ${if (added == 1) &quot;game&quot; else &quot;games&quot;}. ${result.games.size - added} already on your wishlist.&quot; +"
+        errorLine2="                          ^">
+        <location
+            file="src/main/java/com/gamefibre/WishlistDialog.kt"
+            line="150"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="            status.text = &quot;Added $added ${if (added == 1) &quot;game&quot; else &quot;games&quot;}. ${result.games.size - added} already on your wishlist.&quot; +"
+        errorLine2="                           ~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/WishlistDialog.kt"
+            line="150"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="            status.text = &quot;Added $added ${if (added == 1) &quot;game&quot; else &quot;games&quot;}. ${result.games.size - added} already on your wishlist.&quot; +"
+        errorLine2="                                                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/WishlistDialog.kt"
+            line="150"
+            column="109"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="                        notice.text = &quot;This page cannot be opened in the Microsoft sign-in window.&quot;"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/XboxLoginActivity.kt"
+            line="80"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="                        notice.text = &quot;This page cannot be opened in the Microsoft sign-in window.&quot;"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/XboxLoginActivity.kt"
+            line="80"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="                    notice.text = &quot;Microsoft&apos;s sign-in page could not be reached. Check the phone&apos;s internet connection, then close this window and try again.&quot;"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/XboxLoginActivity.kt"
+            line="90"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="                    notice.text = &quot;Microsoft&apos;s sign-in page could not be reached. Check the phone&apos;s internet connection, then close this window and try again.&quot;"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/gamefibre/XboxLoginActivity.kt"
+            line="90"
+            column="36"/>
+    </issue>
+
+</issues>

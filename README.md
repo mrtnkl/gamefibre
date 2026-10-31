@@ -10,7 +10,8 @@ Connect your accounts and let your collection load, then take it offline. Your l
 - **Track your progress.** Mark games as Unplayed, Play next, Playing, On hold, or Finished.
 - **Keep a wishlist.** Save games you’d like to get and import your Steam wishlist.
 - **Choose your covers.** Pick your preferred custom cover art from SteamGridDB using your own API key. Selected covers are saved for offline browsing too.
-- **Explore each game.** Browse screenshots, watch YouTube videos, and check estimated completion times to help choose your next game.
+- **Explore each game.** Browse screenshots and watch YouTube videos to get a feel for what you might play next.
+- **Find the right fit.** Check HowLongToBeat completion-time estimates and Metascores where available, then sort by time to beat or score to find a quick adventure or a highly rated game.
 - **Find something new.** Browse Xbox Game Pass titles or search the Steam catalog using community tags to find the kinds of games you enjoy.
 - **Bring your game files to Android.** Download games you own on Steam, GOG, or Epic Games and export them as a ZIP file or game folder to your device’s **Downloads** folder.
 
