@@ -52,4 +52,13 @@ class SteamCatalogTest {
         assertTrue(portal.positive <= portal.reviewCount)
         assertEquals("STEAM:620", portal.entry().key)
     }
+
+    @Test fun libraryScoreIndexMatchesTheBundledCatalog() {
+        val file = File("src/main/assets/steam-catalog-v1.bin.xz")
+        val catalog = file.inputStream().use { SteamCatalog.read(it) { emptyList() } }
+        val scores = file.inputStream().use(SteamCatalog::readMetascores)
+        assertEquals(catalog.games.filter { it.metascore > 0 }.associate { it.appId to it.metascore }, scores)
+        assertEquals(95, scores[620])
+        assertNull(scores[-1])
+    }
 }

@@ -80,8 +80,14 @@ internal class SteamCatalog(val games: List<CatalogGame>, tags: (Int) -> List<St
         return CatalogPage(selected, total, page, facets)
     }
     companion object {
-        fun read(stream: InputStream, tags: (Int) -> List<String>): SteamCatalog {
-            val games = DataInputStream(XZInputStream(stream, 16 * 1024).buffered()).use { input ->
+        fun read(stream: InputStream, tags: (Int) -> List<String>): SteamCatalog = SteamCatalog(readGames(stream), tags)
+
+        /** Library sorting needs only scores, without constructing store search/tag indexes. */
+        fun readMetascores(stream: InputStream): Map<Int, Int> = readGames(stream)
+            .filter { it.metascore in 1..100 }.associate { it.appId to it.metascore }
+
+        private fun readGames(stream: InputStream): List<CatalogGame> =
+            DataInputStream(XZInputStream(stream, 16 * 1024).buffered()).use { input ->
                 require(input.readInt() == 0x53544341 && input.readInt() == 1) { "Unsupported Steam catalog" }
                 val count = input.readInt().also { require(it in 1..1_000_000) }
                 fun integer(): Int {
@@ -106,7 +112,5 @@ internal class SteamCatalog(val games: List<CatalogGame>, tags: (Int) -> List<St
                     }
                 }.also { require(input.read() == -1) }
             }
-            return SteamCatalog(games, tags)
-        }
     }
 }

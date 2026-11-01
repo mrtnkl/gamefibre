@@ -76,6 +76,7 @@ class MainActivity : AppCompatActivity() {
     private var steamTagIndex: SteamTagIndex? = null
     private var storeSearchView: StoreSearchView? = null
     private var storeSearchState: Bundle? = null
+    private var libraryMetascores = emptyMap<Int, Int>()
     private var storeCatalog: SteamCatalog? = null
     private var storeCatalogJob: Job? = null
     private var gameReturnTab = "library"
@@ -270,6 +271,10 @@ class MainActivity : AppCompatActivity() {
             val beatStarted = android.os.SystemClock.elapsedRealtime()
             beatIndex = withContext(Dispatchers.IO) { runCatching { BeatIndex.load(this@MainActivity) }.getOrNull() }
             steamTagIndex = withContext(Dispatchers.IO) { runCatching { SteamTagIndex.load(this@MainActivity) }.getOrNull() }
+            libraryMetascores = withContext(Dispatchers.IO) {
+                runCatching { assets.open("steam-catalog-v1.bin.xz").use(SteamCatalog::readMetascores) }.getOrDefault(emptyMap())
+            }
+            libraryRevision++
             liveSteamTags.load()
             beatIndex?.updateKnownSteamGames(steamEntries)
             logPerformance("index", beatStarted)
@@ -2165,7 +2170,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun mergedDetails(game: LibraryEntry): GameDetails {
         val sources = ownedCopies(game).sortedWith(compareBy<LibraryEntry> { customArtwork.address(it.key) == null }.thenBy { it.store.ordinal })
-        return mergeGameDetails(sources.map { it.details } + sources.mapNotNull { pageDetails[it.key] })
+        return libraryDetails(sources, libraryMetascores, ::communitySteamId) { pageDetails[it.key] }
     }
     private fun gameScreenKey() = "game:$selectedKey:${selectedEntry?.let { assetRepository.published(it)?.let { card -> "${card.asset.blob}:${card.currentAccess}" } }}:${selectedEntry?.let { mergedDetails(it).json() }}:${beatIndex != null}:${selectedEntry?.let(::ownedCopies)?.map { it.key }}:$libraryRevision:$ownedTagRevision"
     private fun fetchPageDetails(game: LibraryEntry) {
