@@ -10,7 +10,7 @@ internal fun collectionChangesAfterSignOut(values: Map<String, *>, store: String
     return buildMap {
         values.forEach { (key, value) ->
             when {
-                key.startsWith("download:$prefix") || key.startsWith("progress:$prefix") || key.startsWith("library:$prefix") -> {
+                key.startsWith("download:$prefix") || key.startsWith("progress:$prefix") || key.startsWith("library:$prefix") || key.startsWith("metascore:$prefix") -> {
                     if (key.substringAfter(':') !in discs) put(key, null)
                 }
                 key == "download-keys" || key.startsWith("members:") -> {

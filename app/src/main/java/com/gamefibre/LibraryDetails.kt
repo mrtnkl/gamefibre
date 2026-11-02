@@ -1,6 +1,6 @@
 package com.gamefibre
 
-/** Bundled scores fill gaps before any game page is opened, including saved libraries and wishlists. */
+/** Resolve metadata during collection ingestion, before games are published to the interface. */
 internal fun libraryDetails(
     sources: List<LibraryEntry>, metascores: Map<Int, Int>, steamId: (LibraryEntry) -> Int?,
     pageDetails: (LibraryEntry) -> GameDetails?,

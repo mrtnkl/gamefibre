@@ -284,7 +284,7 @@ class MainActivity : AppCompatActivity() {
             else if (tab == "game") {
                 pageDetailsUpdate?.invoke()
                 screenKey = gameScreenKey()
-            } else updateLibrary(true)
+            } else render(state, true)
         }
         repeat(2) {
             scope.launch {
@@ -563,8 +563,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
         val owners = libraryOwners()
-        val merged = mergeLibrary(steamEntries, remoteEntries.values.flatten(), collection.libraryGames(), assetRepository.remembered(owners),
-            collection.wishlistGames(), collection.downloaded(), transferEntries())
+        val merged = collection.enrichMetascores(mergeLibrary(steamEntries, remoteEntries.values.flatten(), collection.libraryGames(), assetRepository.remembered(owners),
+            collection.wishlistGames(), collection.downloaded(), transferEntries()), libraryMetascores, ::communitySteamId)
         if (ownedLibrary != merged.owned) {
             ownedLibrary = merged.owned
             ownedTagRevision++
@@ -576,10 +576,10 @@ class MainActivity : AppCompatActivity() {
         val combined = merged.combined
         observedLibraryKeys = merged.observedKeys
         // Cover choices are published through refreshCustomArtwork; only library shape changes re-stage everything.
-        val assetSignature = "${combined.hashCode()}:${owners}:${observedLibraryKeys.hashCode()}"
+        val assetSignature = "${combined.hashCode()}:${owners}:${observedLibraryKeys.hashCode()}:${ownedKeys.hashCode()}"
         if (stagedAssetSignature != assetSignature) {
             stagedAssetSignature = assetSignature
-            assetRepository.synchronize(combined, owners, combined.filter { listStore(collection.list) == it.store }.take(24).map { it.key }.toSet(), observed=observedLibraryKeys)
+            assetRepository.synchronize(combined, owners, combined.filter { listStore(collection.list) == it.store }.take(24).map { it.key }.toSet(), observed=observedLibraryKeys, owned=ownedKeys)
         }
         selectedEntry = combined.find { it.key == selectedKey } ?: selectedEntry
         if (tab == "game" && gameReturnTab == "store") selectedEntry?.let { current ->
@@ -790,7 +790,7 @@ class MainActivity : AppCompatActivity() {
             // Refresh account data without invalidating usable artwork or rebinding unchanged cards.
             if (connected) engine.refreshLibrary() else if (state.optBoolean("sessionAvailable") && state.optString("status") == "signedOut") engine.signIn(forceLibraryRefresh = true)
             GameStore.entries.filter { accounts.state.value.getValue(it).saved }.forEach(accounts::refresh)
-            assetRepository.synchronize(entries, libraryOwners(), libraryVisibleKeys(), refresh = true, observed=observedLibraryKeys)
+            assetRepository.synchronize(entries, libraryOwners(), libraryVisibleKeys(), refresh = true, observed=observedLibraryKeys, owned=ownedKeys)
             scheduleTagEnrichment(force = true)
         }
     }
@@ -2170,7 +2170,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun mergedDetails(game: LibraryEntry): GameDetails {
         val sources = ownedCopies(game).sortedWith(compareBy<LibraryEntry> { customArtwork.address(it.key) == null }.thenBy { it.store.ordinal })
-        return libraryDetails(sources, libraryMetascores, ::communitySteamId) { pageDetails[it.key] }
+        return mergeGameDetails(sources.map { it.details } + sources.mapNotNull { pageDetails[it.key] })
     }
     private fun gameScreenKey() = "game:$selectedKey:${selectedEntry?.let { assetRepository.published(it)?.let { card -> "${card.asset.blob}:${card.currentAccess}" } }}:${selectedEntry?.let { mergedDetails(it).json() }}:${beatIndex != null}:${selectedEntry?.let(::ownedCopies)?.map { it.key }}:$libraryRevision:$ownedTagRevision"
     private fun fetchPageDetails(game: LibraryEntry) {
@@ -2194,7 +2194,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             if (cached.isNotEmpty()) {
-                pageDetails.record(keys, mergeGameDetails(cached), retryNeeded = true)
+                val details = mergeGameDetails(cached)
+                details.metascore?.let { score -> collection.rememberMetascores(keys.associateWith { score }) }
+                pageDetails.record(keys, details, retryNeeded = true)
                 if (tab == "game" && selectedKey == game.key) {
                     pageDetailsUpdate?.invoke()
                     screenKey = gameScreenKey()
@@ -2227,6 +2229,7 @@ class MainActivity : AppCompatActivity() {
                 mergeGameDetails(details) to retryNeeded
             }
             pageDetails.record((sources.map { it.key } + game.key).distinct(), loaded.first, loaded.second)
+            loaded.first.metascore?.let { score -> collection.rememberMetascores(keys.associateWith { score }) }
             if (collection.sort == "Metascore") retainedLibrary?.pages?.values?.forEach { it.builtQuery = "" }
             if (tab == "game" && selectedKey == game.key) {
                 pageDetailsUpdate?.invoke()
@@ -2571,7 +2574,7 @@ class MainActivity : AppCompatActivity() {
                 "Progress: ${progress.label}. Choose progress") {
                 showGameProgress(game, ::updateListChips)
             })
-            listChips.addView(ui.listChip("Wishlist", isWishlisted(game)) { included -> setWishlist(game, included) })
+            if (!isOwned(game)) listChips.addView(ui.listChip("Wishlist", isWishlisted(game)) { included -> setWishlist(game, included) })
             if (gameReturnTab == "store" && !isOwned(game)) return
             collection.editableLists.forEach { list ->
                 val label = if (list == "Favorites") "Favorite" else list

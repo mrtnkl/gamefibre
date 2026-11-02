@@ -71,6 +71,12 @@ internal class AssetStore(context: Context, databaseName: String = "library-asse
     fun selection(group: String): SelectedAsset? = readableDatabase.rawQuery("SELECT blob,source,fingerprint FROM selections WHERE group_id=?", arrayOf(group)).use {
         if (!it.moveToFirst()) null else SelectedAsset(group, it.getString(0), it.getString(1), it.getString(2)).takeIf { selected -> blob(selected.blob).isFile }
     }
+    /** Preserve the last usable image when a merged group becomes independent products. */
+    fun retainSelection(group: String, selected: SelectedAsset) {
+        writableDatabase.insertOrThrow("selections", null, ContentValues().apply {
+            put("group_id", group); put("blob", selected.blob); put("source", selected.source); put("fingerprint", selected.fingerprint)
+        })
+    }
     fun candidate(key: String): LibraryEntry? = readableDatabase.rawQuery("SELECT candidate FROM games WHERE key=?", arrayOf(key)).use {
         if (!it.moveToFirst()) null else entry(key, it.getString(0))
     }

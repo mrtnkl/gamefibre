@@ -37,6 +37,7 @@ internal class AssetRepository internal constructor(
     val library=state.asStateFlow()
     private var index:BeatIndex?=null
     @Volatile private var activeOwners:Map<LibraryStore,String> = emptyMap()
+    @Volatile private var rememberedOwnedKeys:Set<String> = emptySet()
     private val gameSteam=ConcurrentHashMap<String,Int>()
     private val refreshKeys=ConcurrentHashMap.newKeySet<String>()
     private val completed=java.util.concurrent.atomic.AtomicInteger()
@@ -77,9 +78,14 @@ internal class AssetRepository internal constructor(
     }
     @Synchronized private fun publishState() {
         val rows=store.games()
-        val observations=rows.map { "inventory:${it.game.store.name}:${it.scope}" }.distinct().associateWith { key ->
-            store.provider(key)?.first?.optJSONArray("keys")?.let { array -> (0 until array.length()).map { array.getString(it) }.toSet() }.orEmpty()
+        val inventories=rows.map { "inventory:${it.game.store.name}:${it.scope}" }.distinct().associateWith { store.provider(it)?.first }
+        val observations=inventories.mapValues { (_, inventory) ->
+            inventory?.optJSONArray("keys")?.let { array -> (0 until array.length()).map { array.getString(it) }.toSet() }.orEmpty()
         }
+        // Artwork can be prepared for wishlist and downloaded games without establishing ownership.
+        rememberedOwnedKeys=inventories.values.flatMap { inventory ->
+            inventory?.optJSONArray("owned")?.let { array -> (0 until array.length()).map { array.getString(it) } }.orEmpty()
+        }.toSet()
         val cards=rows.mapNotNull { row -> row.selected?.let {
             row.game.key to PublishedCard(row.game,it,row.scope,row.scope=="local" || row.game.key in observations["inventory:${row.game.store.name}:${row.scope}"].orEmpty())
         } }.toMap()
@@ -89,7 +95,7 @@ internal class AssetRepository internal constructor(
     }
     private suspend fun idle(timeout:Long?) { if(timeout==null)wake.receive() else withTimeoutOrNull(timeout){wake.receive()} }
     private fun wakeWorkers() { repeat(4) { wake.trySend(Unit) } }
-    fun synchronize(games:List<LibraryEntry>,owners:Map<LibraryStore,String>,priority:Set<String>,refresh:Boolean=false,observed:Set<String> = games.map { it.key }.toSet()):Job {
+    fun synchronize(games:List<LibraryEntry>,owners:Map<LibraryStore,String>,priority:Set<String>,refresh:Boolean=false,observed:Set<String> = games.map { it.key }.toSet(),owned:Set<String> = games.map { it.key }.toSet()):Job {
         activeOwners = owners.toMap()
         if(refresh)refreshRequested.set(true)
         val request=stagingRevision.incrementAndGet()
@@ -105,7 +111,7 @@ internal class AssetRepository internal constructor(
             val previous=store.games().associateBy { it.game.key }
             // One commit for the whole library instead of one write transaction per game.
             val saved=store.transaction {
-                owners.forEach { (source,owner) -> store.provider("inventory:${source.name}:$owner",org.json.JSONObject().put("keys",org.json.JSONArray(observed.filter { it.startsWith("${source.name}:") }))) }
+                owners.forEach { (source,owner) -> store.provider("inventory:${source.name}:$owner",org.json.JSONObject().put("keys",org.json.JSONArray(observed.filter { it.startsWith("${source.name}:") })).put("owned",org.json.JSONArray(owned.filter { it.startsWith("${source.name}:") }))) }
                 groups.mapNotNull { copies -> stageGroup(copies,owners,previous,priority,forceRefresh,known) }
             }
             saved.forEach { publishSaved(it,owners) }
@@ -132,9 +138,15 @@ internal class AssetRepository internal constructor(
     /** Stages one merged group. Returns a saved cover that still needs publication once the staging commit is done. */
     private fun stageGroup(copies:List<LibraryEntry>,owners:Map<LibraryStore,String>,previous:Map<String,StoredGame>,priority:Set<String>,forceRefresh:Boolean,known:BeatIndex?):SavedChoice? {
         val old=copies.mapNotNull { previous[it.key] }
-        val group=old.firstOrNull { it.selected!=null }?.group ?: old.firstOrNull()?.group ?: UUID.randomUUID().toString()
-        val addresses=copies.mapNotNull { custom.address(it.key) }.distinct()
         val selected=old.firstNotNullOfOrNull { it.selected }
+        val previousGroup=selected?.group ?: old.firstOrNull()?.group
+        val keys=copies.map { it.key }.toSet()
+        // A title group can split when another product makes its store identities ambiguous.
+        // Never leave independent groups sharing a selection and conflicting fingerprints.
+        val group=previousGroup?.takeIf { store.groupCandidates(it).all { member -> member.key in keys } }
+            ?: UUID.randomUUID().toString()
+        if(group!=previousGroup && selected!=null)store.retainSelection(group,selected)
+        val addresses=copies.mapNotNull { custom.address(it.key) }.distinct()
         val override=selected?.source?.takeIf { it in addresses } ?: addresses.firstOrNull().orEmpty()
         val steamId=copies.firstNotNullOfOrNull { known?.steamId(it,copies)?.toIntOrNull() ?: SteamTitleMatcher.knownSteamId(it,copies)?.toIntOrNull() }
         val overrideRevision=copies.firstNotNullOfOrNull { custom.file(it.key) }?.let { "${it.length()}:${it.lastModified()}" }
@@ -173,7 +185,9 @@ internal class AssetRepository internal constructor(
         val card=copies.firstNotNullOfOrNull { state.value.cards[it.key]?.takeIf { card -> card.scope=="local" || card.scope==activeOwners[it.store] } } ?: return null
         return PublishedCard(card.game.copy(copies=game.copies),card.asset,card.scope,copies.any { state.value.cards[it.key]?.currentAccess==true })
     }
-    fun remembered(owners:Map<LibraryStore,String>):List<LibraryEntry> = state.value.cards.values.filter { it.scope == owners[it.game.store] }.map { it.game }
+    fun remembered(owners:Map<LibraryStore,String>):List<LibraryEntry> = state.value.cards.values.filter {
+        it.scope == owners[it.game.store] && it.game.key in rememberedOwnedKeys
+    }.map { it.game }
     fun steamId(game:LibraryEntry):Int?=gameSteam[game.key] ?: index?.steamId(game,game.copies)?.toIntOrNull()
     fun address(game:LibraryEntry):String?=published(game)?.asset?.source
     fun file(game:LibraryEntry):File?=published(game)?.asset?.let { store.blob(it.blob) }

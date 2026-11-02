@@ -26,7 +26,9 @@ internal object CustomArtworkPublicationAudit {
         try {
             val games = listOf(
                 LibraryEntry(LibraryStore.STEAM, "123456789", name),
-                LibraryEntry(LibraryStore.GOG, "123456789", name)
+                LibraryEntry(LibraryStore.GOG, "123456789", name),
+                LibraryEntry(LibraryStore.EPIC, "custom-artwork-audit", name),
+                LibraryEntry(LibraryStore.XBOX, "BNBWFH89FCF1", name)
             )
             val keys = games.map { it.key }
             withTimeout(5_000) { repository.synchronize(games, emptyMap(), keys.toSet()).join() }
@@ -54,7 +56,7 @@ internal object CustomArtworkPublicationAudit {
                 check(store.jobs() == 0) { "Saved choice still requires background preparation" }
             }
             check(transport.requests.get() == requests) { "Local publication made a network request" }
-            "PASS: first and replacement covers published for both stores offline, decoded before return; ${times}ms"
+            "PASS: first and replacement covers published for all four stores offline, decoded before return; ${times}ms"
         } finally {
             job.cancelAndJoin()
             transport.networkAvailable = network

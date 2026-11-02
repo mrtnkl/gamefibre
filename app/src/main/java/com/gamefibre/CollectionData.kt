@@ -28,6 +28,47 @@ internal class CollectionData(val preferences: android.content.SharedPreferences
     private var savedWishlist: List<LibraryEntry>? = null
     private var savedDownloads: Map<String, Pair<LibraryEntry, String>>? = null
     private var dataRevision = preferences.getLong("data-revision", 0)
+
+    /** Collection metadata is restored before publication, independently of catalog/page loading. */
+    private fun restoreMetascore(game: LibraryEntry): LibraryEntry {
+        val score = preferences.getString("metascore:${game.key}", null)?.toIntOrNull()?.takeIf { it in 1..100 }
+            ?: return game
+        if (game.details.metascore == score) return game
+        val details = game.details.copy(metascore = score)
+        return game.copy(steam = game.steam?.copy(details = details),
+            remote = game.remote?.copy(details = details))
+    }
+
+    fun rememberMetascores(scores: Map<String, Int>) = synchronized(Companion) {
+        val changed = scores.filter { (key, score) ->
+            score in 1..100 && preferences.getString("metascore:$key", null) != score.toString()
+        }
+        if (changed.isEmpty()) return@synchronized
+        val editor = preferences.edit()
+        changed.forEach { (key, score) -> editor.putString("metascore:$key", score.toString()) }
+        check(editor.putLong("data-revision", preferences.getLong("data-revision", 0) + 1).commit()) {
+            "Could not save collection Metascores."
+        }
+        refresh()
+    }
+
+    /** Fill existing and newly added games once; account refreshes cannot erase learned scores. */
+    fun enrichMetascores(library: MergedLibrary, scores: Map<Int, Int>, steamId: (LibraryEntry) -> Int?): MergedLibrary {
+        val restored = library.combined.map(::restoreMetascore)
+        val byTitle = restored.groupBy { it.normalizedName }
+        val enriched = restored.map { game ->
+            if (game.details.metascore in 1..100) game else {
+                val copies = matchingLibraryCopies(game, byTitle[game.normalizedName].orEmpty())
+                val score = copies.asReversed().firstNotNullOfOrNull { it.details.metascore?.takeIf { score -> score in 1..100 } }
+                    ?: if (scores.isEmpty()) null else libraryDetails(copies, scores, steamId) { null }.metascore
+                if (score == null) game else game.copy(steam = game.steam?.copy(details = game.details.copy(metascore = score)),
+                    remote = game.remote?.copy(details = game.details.copy(metascore = score)))
+            }
+        }
+        rememberMetascores(enriched.mapNotNull { game -> game.details.metascore?.let { game.key to it } }.toMap())
+        val byKey = enriched.associateBy { it.key }
+        return MergedLibrary(library.owned.map { byKey.getValue(it.key) }, enriched, library.wishlistKeys, library.observedKeys)
+    }
     fun refresh() {
         val revision = preferences.getLong("data-revision", 0)
         if (revision != dataRevision) {
@@ -145,7 +186,7 @@ internal class CollectionData(val preferences: android.content.SharedPreferences
         refresh()
         return savedLibrary ?: preferences.all.entries
         .filter { it.key.startsWith("library:") }
-        .map { LibraryRecords.read(JSONArray().put(JSONObject(it.value as String))).single() }
+        .map { restoreMetascore(LibraryRecords.read(JSONArray().put(JSONObject(it.value as String))).single()) }
         .also { savedLibrary = it }
     }
 
@@ -180,6 +221,10 @@ internal class CollectionData(val preferences: android.content.SharedPreferences
         progress.keys().forEach { key -> editor.putString("progress:$key", progress.getString(key)) }
         LibraryRecords.read(data.getJSONArray("games")).forEach { game ->
             editor.putString("library:${game.key}", LibraryRecords.json(game).toString())
+            game.details.metascore?.let { editor.putString("metascore:${game.key}", it.toString()) }
+        }
+        mergedWishlist.forEach { game ->
+            game.details.metascore?.let { editor.putString("metascore:${game.key}", it.toString()) }
         }
         val settings = data.getJSONObject("settings")
         run {
@@ -263,7 +308,7 @@ internal class CollectionData(val preferences: android.content.SharedPreferences
 
     fun wishlistGames(): List<LibraryEntry> {
         refresh()
-        return savedWishlist ?: WishlistItems.read(JSONArray(preferences.getString("wishlist-items", "[]")))
+        return savedWishlist ?: WishlistItems.read(JSONArray(preferences.getString("wishlist-items", "[]"))).map(::restoreMetascore)
             .also { savedWishlist = it }
     }
     fun addWishlist(games: List<LibraryEntry>): Int = synchronized(Companion) {
@@ -275,6 +320,8 @@ internal class CollectionData(val preferences: android.content.SharedPreferences
     fun removeWishlist(keys: Set<String>) = synchronized(Companion) {
         saveWishlist(wishlistGames().filterNot { it.key in keys })
     }
+    // The KTX helper hides the commit result needed to report a failed save.
+    @android.annotation.SuppressLint("UseKtx")
     private fun saveWishlist(games: List<LibraryEntry>) {
         val data = JSONArray(games.map(WishlistItems::json))
         WishlistItems.read(data)
@@ -291,7 +338,7 @@ internal class CollectionData(val preferences: android.content.SharedPreferences
                 val game = LibraryEntry(store, data.getString("id"), data.getString("name"), remote =
                     com.gamefibre.stores.StoreGame(data.getString("id"), data.getString("name"),
                         imageUrl = data.optString("artwork"), details = details))
-                key to (game to data.optString("output"))
+                key to (restoreMetascore(game) to data.optString("output"))
             }.getOrNull()
         }.toMap().also { savedDownloads = it }
     }

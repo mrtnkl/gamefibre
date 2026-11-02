@@ -54,7 +54,12 @@ class AssetRepositoryTest {
     }
 
     @Test fun savedCoverPublishesOfflineForEveryCopyAndReplacementChangesHandle() = runBlocking {
-        val games = listOf(LibraryEntry(LibraryStore.STEAM, "1", "Shared"), LibraryEntry(LibraryStore.GOG, "1", "Shared"))
+        val games = listOf(
+            LibraryEntry(LibraryStore.STEAM, "1", "Shared"),
+            LibraryEntry(LibraryStore.GOG, "1", "Shared"),
+            LibraryEntry(LibraryStore.EPIC, "shared", "Shared"),
+            LibraryEntry(LibraryStore.XBOX, "BNBWFH89FCF1", "Shared")
+        )
         val keys = games.map { it.key }
         val requests = repository.transport.requests.get()
         withTimeout(10_000) { repository.synchronize(games, emptyMap(), keys.toSet()).join() }
@@ -75,6 +80,33 @@ class AssetRepositoryTest {
             assertEquals("saved choice needs no background job", 0, store.jobs())
         }
         assertEquals("no network for a local publication", requests, repository.transport.requests.get())
+    }
+
+    @Test fun splitGroupsKeepArtworkAndPublishIndependentCoverChoices() = runBlocking {
+        val gog = LibraryEntry(LibraryStore.GOG, "1719198803", "Kingdom Come: Deliverance")
+        val epic = LibraryEntry(LibraryStore.EPIC, "Eel", "Kingdom Come Deliverance")
+        val games = listOf(gog, epic)
+        val original = "https://cdn2.steamgriddb.com/grid/original.jpg"
+        custom.apply(games.map { it.key }, original, cover(0))
+        withTimeout(10_000) { repository.synchronize(games, emptyMap(), emptySet()).join() }
+        val first = assertNotNull(repository.published(gog))
+        assertEquals(first.asset.group, repository.published(epic)?.asset?.group)
+        custom.reset(games.map { it.key })
+
+        // Two products on another store make the previously merged title ambiguous.
+        val ambiguous = listOf("BNBWFH89FCF1", "9P3T7HVKM6D0").map { LibraryEntry(LibraryStore.XBOX, it, gog.name) }
+        withTimeout(10_000) { repository.synchronize(games + ambiguous, emptyMap(), emptySet()).join() }
+        assertNotEquals(repository.published(gog)?.asset?.group, repository.published(epic)?.asset?.group)
+        games.forEach { assertEquals("retain usable artwork on split", first.asset.blob, repository.published(it)?.asset?.blob) }
+
+        val replacement = "https://cdn2.steamgriddb.com/grid/replacement.jpg"
+        custom.apply(listOf(gog.key), replacement, cover(1))
+        withTimeout(10_000) { repository.refreshArtwork(listOf(gog), emptyMap()).join() }
+        assertEquals(replacement, repository.published(gog)?.asset?.source)
+        assertNotNull("replacement decoded before display", repository.peek(gog))
+        assertEquals(original, repository.published(epic)?.asset?.source)
+        withTimeout(10_000) { repository.synchronize(games + ambiguous, emptyMap(), emptySet()).join() }
+        assertEquals(replacement, repository.published(gog)?.asset?.source)
     }
 
     @Test fun refreshArtworkLeavesUnrelatedGamesUntouched() = runBlocking {
@@ -109,6 +141,32 @@ class AssetRepositoryTest {
         val current = LibraryEntry(LibraryStore.GOG, "2", "New account")
         withTimeout(10_000) { repository.synchronize(listOf(current), mapOf(LibraryStore.GOG to "new"), emptySet()).join() }
         assertEquals(setOf(current.key), store.games().map { it.game.key }.toSet())
+    }
+
+    @Test fun preparedWishlistGamesNeverBecomeRememberedOwnership() = runBlocking {
+        val owned = LibraryEntry(LibraryStore.XBOX, "9NBLGGH4R315", "Owned Xbox game", remote = com.gamefibre.stores.StoreGame("9NBLGGH4R315", "Owned Xbox game"))
+        val wish = LibraryEntry(LibraryStore.XBOX, "9NBLGGH4R316", "Wishlist Xbox game", remote = com.gamefibre.stores.StoreGame("9NBLGGH4R316", "Wishlist Xbox game"))
+        val owners = mapOf(LibraryStore.XBOX to "account")
+        val games = listOf(owned, wish)
+        games.forEachIndexed { index, game ->
+            custom.apply(listOf(game.key), "https://cdn2.steamgriddb.com/grid/ownership-$index.jpg", cover(index))
+        }
+        withTimeout(10_000) {
+            repository.synchronize(games, owners, emptySet(), owned = setOf(owned.key)).join()
+        }
+        assertNotNull(repository.published(wish))
+        assertEquals(listOf(owned), repository.remembered(owners))
+        // Artwork changes and refreshes must preserve both the cover and the ownership boundary.
+        withTimeout(10_000) { repository.refreshArtwork(listOf(wish), owners).join() }
+        withTimeout(10_000) {
+            repository.synchronize(games, owners, emptySet(), refresh = true, owned = setOf(owned.key)).join()
+        }
+        assertNotNull(repository.published(wish))
+        assertEquals(listOf(owned), repository.remembered(owners))
+        withTimeout(10_000) {
+            repository.synchronize(listOf(owned), owners, emptySet(), owned = setOf(owned.key)).join()
+        }
+        assertEquals(listOf(owned), repository.remembered(owners))
     }
 
     private fun <T : Any> assertNotNull(value: T?): T { org.junit.Assert.assertNotNull(value); return value!! }

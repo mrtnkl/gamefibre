@@ -91,7 +91,8 @@ class CollectionSnapshotTest {
         val destination = CollectionData(testPreferences())
         destination.mergeBackup(CollectionSnapshot.create(destination, games, emptyMap()))
         val changes = collectionChangesAfterSignOut(destination.preferences.all, "XBOX")
-        assertEquals(setOf("library:XBOX:9NBLGGH4R315", "library:XBOX:9NBLGGH4R316"), changes.keys)
+        assertEquals(setOf("library:XBOX:9NBLGGH4R315", "library:XBOX:9NBLGGH4R316",
+            "metascore:XBOX:9NBLGGH4R315", "metascore:XBOX:9NBLGGH4R316"), changes.keys)
         assertTrue(changes.values.all { it == null })
     }
 }
