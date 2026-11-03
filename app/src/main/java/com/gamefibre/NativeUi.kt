@@ -38,6 +38,12 @@ class NativeUi(val context: Context) {
         typeface = Typeface.create(font, if (medium) 500 else 400, false)
         setLineSpacing(dp(3).toFloat(), 1f)
     }
+    fun link(label: String, size: Int = 14, action: () -> Unit) = text(label, size, blue).apply {
+        minimumHeight = dp(48); gravity = Gravity.CENTER_VERTICAL
+        paintFlags = paintFlags or android.graphics.Paint.UNDERLINE_TEXT_FLAG
+        isFocusable = true
+        setOnClickListener { if (isEnabled) action() }
+    }
     fun icon(resource: Int, description: String? = null, color: Int = secondary) = ImageView(context).apply {
         setImageResource(resource); imageTintList = ColorStateList.valueOf(color)
         contentDescription = description

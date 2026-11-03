@@ -386,7 +386,11 @@ class MainActivity : AppCompatActivity() {
         scheduleTagEnrichment()
     }
     override fun onResume() {
-        super.onResume(); engine.refreshAuthentication(); assetRepository.resume(); render(engine.snapshot()); pageVideos?.resume()
+        super.onResume()
+        engine.restoreSession()
+        // A download renews its own store session; avoid racing that account operation.
+        if (storeDownloads.state.value?.running != true) accounts.restoreSessions()
+        engine.refreshAuthentication(); assetRepository.resume(); render(engine.snapshot()); pageVideos?.resume()
     }
     override fun onPostResume() { super.onPostResume(); appUpdatePrompt.onResume() }
     override fun onPause() { pageVideos?.pause(); super.onPause() }
@@ -866,13 +870,19 @@ class MainActivity : AppCompatActivity() {
             val heading = ui.row()
             heading.addView(ui.icon(R.drawable.ic_gamepad_2, color = ui.blue), LinearLayout.LayoutParams(ui.dp(26), ui.dp(26)).apply { marginEnd = ui.dp(12) })
             heading.addView(ui.text(source.label, 21, medium = true)); ui.add(card, heading); ui.gap(card, 8)
-            ui.add(card, ui.text(when {
+            val statusText = when {
                 working -> "Connecting and refreshing…"
                 !active && (saved || cached) -> "Reconnect needed · $count ${if (count == 1) "game" else "games"}"
                 accountError.isNotBlank() -> if (active) "Refresh unavailable · $count ${if (count == 1) "game" else "games"}" else "Could not connect · Try again"
                 active -> "Connected · $count ${if (count == 1) "game" else "games"}"
                 else -> "Not connected"
-            }, 13, ui.secondary))
+            }
+            ui.add(card, if (!active && !working && (saved || cached)) ui.link(statusText, 13) {
+                reconnectAccount(source) {
+                    if (source == LibraryStore.STEAM) { steamSignIn = true; render(engine.snapshot(), true) }
+                    else showStoreLogin(source.account!!)
+                }
+            } else ui.text(statusText, 13, ui.secondary))
             if (source == LibraryStore.XBOX) {
                 ui.gap(card, 8)
                 ui.add(card, ui.text("Owned games and Game Pass appear in separate lists.", 13, ui.secondary))
@@ -2931,6 +2941,55 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    private fun accountConnected(store: LibraryStore): Boolean =
+        store.account?.let { accounts.state.value.getValue(it).connected }
+            ?: (engine.snapshot().optString("status") == "signedIn")
+
+    private fun accountConnecting(store: LibraryStore): Boolean =
+        store.account?.let { accounts.state.value.getValue(it).loading }
+            ?: (engine.snapshot().optString("status") in listOf("connecting", "restoring", "loggingIn"))
+
+    private fun reconnectAccount(store: LibraryStore, accountsPage: () -> Unit) {
+        scope.launch {
+            val restored = reconnectSavedAccount(
+                connected = { accountConnected(store) },
+                connecting = { accountConnecting(store) },
+                saved = {
+                    store.account?.let { accounts.state.value.getValue(it).saved }
+                        ?: engine.snapshot().optBoolean("sessionAvailable")
+                },
+                reconnect = { store.account?.let { accounts.refresh(it, fetchLibrary = false) } ?: engine.restoreSession() },
+            )
+            if (!restored) accountsPage()
+        }
+    }
+
+    private fun bindReconnectAction(
+        dialog: ContentDialog, game: LibraryEntry,
+        needsConnection: () -> Boolean = { true }, ready: (Boolean) -> Unit = {},
+    ) {
+        val link = ui.link("Reconnect needed", 13) {
+            reconnectAccount(game.store) {
+                if (dialog.isShowing) { dialog.dismiss(); selectTab("accounts") }
+            }
+        }
+        ui.add(dialog.content, link)
+        fun update() {
+            val connected = accountConnected(game.store) || !needsConnection()
+            val connecting = accountConnecting(game.store)
+            link.visibility = if (connected) View.GONE else View.VISIBLE
+            link.text = if (connecting) "Reconnecting…" else "Reconnect needed"
+            enable(link, !connecting)
+            ready(connected)
+        }
+        update()
+        dialog.setOnShowListener {
+            scope.launch {
+                while (dialog.isShowing) { update(); delay(100) }
+            }
+        }
+    }
+
     private fun showDownload(game: LibraryEntry) {
         if (!game.store.downloads) { downloadGame(game); return }
         error = ""
@@ -2976,7 +3035,7 @@ class MainActivity : AppCompatActivity() {
         formats.check(formats.getChildAt(0).id)
         ui.add(content, destination); ui.gap(content)
         val message = ui.text("", 13, ui.error); ui.add(content, message)
-        val reconnect = ui.button("Reconnect") { act { game.store.account?.let { accounts.refresh(it, fetchLibrary = false) } ?: engine.signIn() } }; ui.add(content, reconnect)
+        bindReconnectAction(dialog as ContentDialog, game)
         ui.gap(content)
         val download = ui.button("Download", true, R.drawable.ic_download) {
             withNotifications {
@@ -2996,10 +3055,8 @@ class MainActivity : AppCompatActivity() {
             val isConnected = account?.connected ?: connected
             val connecting = account?.loading ?: (state.optString("status") in listOf("connecting", "restoring", "loggingIn"))
             val active = busy || storeDownloads.state.value?.running == true
-            message.text = error.ifEmpty { if (active) "Pause or cancel the current download before starting another." else if (!isConnected && !saved) "Connect ${game.store.label} in Accounts to download this game." else "" }
+            message.text = error.ifEmpty { if (active) "Pause or cancel the current download before starting another." else "" }
             message.visibility = if (message.text.isEmpty()) View.GONE else View.VISIBLE
-            reconnect.visibility = if (!isConnected && saved) View.VISIBLE else View.GONE
-            enable(reconnect, !connecting)
             enable(download, !active && !connecting && (isConnected || (saved && game.store != LibraryStore.STEAM)) && permissionAction == null)
         }
         showModal(dialog); dialogUpdate?.invoke(); showNotices()

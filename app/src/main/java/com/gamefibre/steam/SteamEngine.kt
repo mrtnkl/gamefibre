@@ -115,6 +115,10 @@ class SteamEngine internal constructor(private val context: android.app.Applicat
         }
         observers.forEach { runCatching { it(copy) } }
     }
+    /** Foreground restoration joins existing authentication and never starts an interactive sign-in. */
+    @Synchronized fun restoreSession() {
+        if (snapshot().optString("status") == "signedOut" && !transferBusy.get() && snapshot().optBoolean("sessionAvailable")) signIn()
+    }
     fun signIn(forceLibraryRefresh: Boolean = false) = startSignIn(null, forceLibraryRefresh)
     fun signInWithCredentials(username: String, password: String) {
         require(username.isNotBlank()) { "Enter your Steam account name" }
@@ -132,7 +136,8 @@ class SteamEngine internal constructor(private val context: android.app.Applicat
         check(!transferBusy.get()) { "A download is running" }
         check(snapshot().getString("status") == "signedOut") { "Sign-in is already in progress" }
         stopped = false
-        credentials = if (login == null) vault.read() else null
+        val restoring = login == null && snapshot().optBoolean("sessionAvailable")
+        credentials = null
         pendingLogin = login
         authSession = null
         guardFlow?.close(); guardFlow = null
@@ -141,14 +146,40 @@ class SteamEngine internal constructor(private val context: android.app.Applicat
         update {
             clearGuardState(it)
             it.remove("connectionError")
-            it.put("status", if (credentials != null) "restoring" else "connecting")
-                .put("sessionAvailable", credentials != null).remove("error")
-            if (credentials == null) it.put("authMethod", if (login == null) "qr" else "password")
+            it.put("status", if (restoring) "restoring" else "connecting")
+                .put("sessionAvailable", restoring).remove("error")
+            if (!restoring) it.put("authMethod", if (login == null) "qr" else "password")
             it.remove("challengeUrl")
         }
+        // Reserve the connection state before returning, but keep vault/SDK setup off the UI thread.
+        connectionJob = scope.launch {
+            try { connect(login, forceLibraryRefresh, restoring) }
+            catch (e: CancellationException) { throw e }
+            catch (e: Exception) {
+                synchronized(this@SteamEngine) {
+                    if (isActive && connectionJob === coroutineContext[Job] && !stopped)
+                        failConnection("Could not connect to Steam. Check your connection.")
+                }
+            }
+        }
+    }
+
+    private suspend fun connect(login: PasswordLogin?, forceLibraryRefresh: Boolean, restoring: Boolean) {
+        val saved = if (login == null) vault.read() else null
+        check(!restoring || saved != null) { "The saved Steam session is unavailable" }
         val config = SteamConfiguration.create { it.withProtocolTypes(EnumSet.of(ProtocolTypes.WEB_SOCKET)) }
         val local = SteamClient(config)
-        client = local
+        val connectionContext = currentCoroutineContext()
+        synchronized(this@SteamEngine) {
+            connectionContext.ensureActive()
+            if (stopped) return
+            credentials = saved
+            client = local
+            if (saved == null) update {
+                it.put("status", "connecting").put("sessionAvailable", false)
+                    .put("authMethod", if (login == null) "qr" else "password")
+            }
+        }
         val manager = CallbackManager(local)
         val subscriptions = mutableListOf<java.io.Closeable>()
         subscriptions += manager.subscribe(ConnectedCallback::class.java) {
@@ -276,17 +307,14 @@ class SteamEngine internal constructor(private val context: android.app.Applicat
                 scope.launch { delay(1000); if (local === client && !stopped) local.connect() }
             } else failConnection("Steam’s server connection was interrupted. Your saved session and library are kept; reconnect to continue.")
         }
-        connectionJob = scope.launch {
-            try {
-                local.connect()
-                while (isActive && local === client && !stopped) manager.runWaitCallbacks(500L)
-            } catch (e: Exception) { if (!stopped && local === client) failConnection("Could not connect to Steam. Check your connection.") }
-            finally { subscriptions.forEach { runCatching { it.close() } } }
-        }
         scope.launch {
             delay(30_000)
             if (local === client && snapshot().optString("status") in listOf("connecting", "restoring")) failConnection("Steam connection timed out. Try again.")
         }
+        try {
+            local.connect()
+            while (currentCoroutineContext().isActive && local === client && !stopped) manager.runWaitCallbacks(500L)
+        } finally { subscriptions.forEach { runCatching { it.close() } } }
     }
     /** Steam can rotate a persistent refresh token after a successful token logon. Renewal is optional. */
     private fun renewSavedSession(local: SteamClient) {

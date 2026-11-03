@@ -50,6 +50,7 @@ internal enum class XboxAccess { OWNED, GAME_PASS, DISC }
 
 internal data class StoreGame(val id: String, val name: String, val namespace: String = "", val catalogId: String = "", val imageUrl: String = "", val details: com.gamefibre.GameDetails = com.gamefibre.GameDetails(), val xboxAccess: XboxAccess? = null)
 internal data class StoreAccount(
+    val owner: String? = null,
     val saved: Boolean = false,
     val connected: Boolean = false,
     val loading: Boolean = false,

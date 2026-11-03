@@ -29,12 +29,22 @@ internal class StoreAccounts internal constructor(private val context: Context) 
     private val authentication = GameStore.entries.associateWith { Mutex() }
     private val mutable = MutableStateFlow(GameStore.entries.associateWith { store ->
         val saved = vaults.getValue(store).read()
-        val cached = vaults.getValue(store).owner()?.let { loadLibrary(store, it) }
-        StoreAccount(saved = saved != null, games = cached.orEmpty(), libraryLoaded = cached != null)
+        val owner = vaults.getValue(store).owner()
+        val cached = owner?.let { loadLibrary(store, it) }
+        StoreAccount(owner = owner, saved = saved != null, games = cached.orEmpty(), libraryLoaded = cached != null)
     })
     val state = mutable.asStateFlow()
 
-    fun libraryOwner(store: GameStore): String? = vaults.getValue(store).owner()
+    /** Restore saved accounts without refetching cached libraries or restarting active authentication. */
+    fun restoreSessions() {
+        GameStore.entries.forEach { store ->
+            val account = state.value.getValue(store)
+            if (account.saved && !account.connected && !account.loading) refresh(store, fetchLibrary = false)
+        }
+    }
+
+    /** Rendering reads published identity without decrypting or waiting for a token rotation. */
+    fun libraryOwner(store: GameStore): String? = state.value.getValue(store).owner
 
     fun owner(store: GameStore): String = vaults.getValue(store).read()?.getString("owner") ?: throw StoreSessionExpired()
 
@@ -59,7 +69,7 @@ internal class StoreAccounts internal constructor(private val context: Context) 
         synchronized(locks.getValue(store)) {
             check(generations[store] == revision) { "The account changed. Resume after signing in again." }
             vaults.getValue(store).save(session.refreshToken, session.owner); sessions[store] = session
-            mutable.update { it + (store to it.getValue(store).copy(saved = true, connected = true)) }
+            mutable.update { it + (store to it.getValue(store).copy(owner = session.owner, saved = true, connected = true)) }
         }
         session
     }
@@ -112,7 +122,7 @@ internal class StoreAccounts internal constructor(private val context: Context) 
                         vaults.getValue(store).save(result.refreshToken, result.owner)
                         if (authenticating && !sameOwner) files.getValue(store).delete()
                         sessions[store] = result
-                        mutable.update { it + (store to StoreAccount(saved = true, connected = true, loading = true,
+                        mutable.update { it + (store to StoreAccount(owner = result.owner, saved = true, connected = true, loading = true,
                             games = if (sameOwner) old.games else emptyList(),
                             libraryLoaded = sameOwner && old.libraryLoaded)) }
                     }
@@ -140,7 +150,7 @@ internal class StoreAccounts internal constructor(private val context: Context) 
                     if (generations[store] != revision) return@launch
                     saveLibrary(store, current.owner, games)
                     if (store == GameStore.XBOX) android.util.Log.i("XboxLibrary", "Library loaded: owned=${games.count { it.xboxAccess == XboxAccess.OWNED }} gamePass=${games.count { it.xboxAccess == XboxAccess.GAME_PASS }}")
-                    mutable.update { it + (store to StoreAccount(saved = true, connected = true, games = games, libraryLoaded = true)) }
+                    mutable.update { it + (store to StoreAccount(owner = current.owner, saved = true, connected = true, games = games, libraryLoaded = true)) }
                 }
             } catch (e: CancellationException) { throw e }
             catch (e: Exception) {
