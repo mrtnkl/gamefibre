@@ -550,6 +550,7 @@ class SteamEngine internal constructor(private val context: android.app.Applicat
                 request.requireOwner(currentOwner())
                 if (!saved.readyToExport) {
                     val licenseList = withTimeout(30_000) { licenses.await() }
+                    requireDownloadValidation(stage)
                     val complete = CompletableDeferred<Unit>()
                     val active = DepotDownloader(local, licenseList, maxDownloads = 4, maxDecompress = 2, maxFileWrites = 1, androidEmulation = true, parentJob = coroutineContext[Job])
                     active.addListener(object : IDownloadListener {
@@ -565,8 +566,8 @@ class SteamEngine internal constructor(private val context: android.app.Applicat
                         override fun onDownloadFailed(item: DownloadItem, error: Throwable) { complete.completeExceptionally(error) }
                     })
                     try {
-                        // The same installation directory and .DepotDownloader manifests are retained.
-                        // JavaSteam validates existing chunks and fetches only missing/invalid data.
+                        // Cached manifests and payloads remain; installed receipts were invalidated
+                        // above so resumed files are checked rather than trusted by manifest ID.
                         active.add(AppItem(request.appId, installDirectory = stage.absolutePath, branch = "public", os = request.os, language = request.language))
                         complete.await()
                     } finally { active.close() }

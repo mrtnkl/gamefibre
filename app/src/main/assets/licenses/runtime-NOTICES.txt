@@ -492,3 +492,5 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+JavaSteam 1.8.0 VZipUtil.kt: app-local MIT-derived variant bounds retained LZMA dictionaries to two shared buffers. All framing, decompression and checksum behavior is unchanged.
