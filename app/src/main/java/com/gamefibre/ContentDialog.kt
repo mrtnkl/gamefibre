@@ -10,12 +10,12 @@ import android.widget.ScrollView
 
 /** A constrained scrolling body with actions that remain visible, including above the keyboard. */
 internal class ContentDialog(context: Context, private val ui: NativeUi, title: String? = null,
-    bodyHeightDp: Int? = null) : Dialog(context) {
+    bodyHeightDp: Int? = null, secureContent: Boolean = context.isScreenCaptureProtected()) : Dialog(context) {
     val content = ui.column(28)
     private val actions = DialogActions(context, ui)
 
     init {
-        window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        window?.protectScreenCapture(secureContent)
         window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         window?.setBackgroundDrawableResource(android.R.color.transparent)
         val panel = ui.column().apply {

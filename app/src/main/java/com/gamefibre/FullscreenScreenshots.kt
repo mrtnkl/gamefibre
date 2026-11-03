@@ -13,7 +13,6 @@ import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.view.ScaleGestureDetector
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import android.widget.FrameLayout
@@ -76,7 +75,6 @@ internal fun showFullscreenScreenshots(context: Context, parent: CoroutineScope,
     dialog.setContentView(root)
     dialog.setOnDismissListener { closed(); scope.cancel() }
     scope.coroutineContext[Job]?.invokeOnCompletion { root.post { if (dialog.isShowing) dialog.dismiss() } }
-    dialog.window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
     dialog.show()
     dialog.window?.apply {
         setLayout(-1, -1)

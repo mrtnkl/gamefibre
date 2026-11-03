@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.collect
 
 internal fun showSteamGridDbKey(activity: Activity, ui: NativeUi, openUrl: (String) -> Unit, dismissed: () -> Unit = {}, saved: () -> Unit = {}) {
     val vault = SteamGridDbKeyVault(activity)
-    val dialog = ContentDialog(activity, ui, "Cover art")
+    val dialog = ContentDialog(activity, ui, "Cover art", secureContent = true)
     val savedKey = vault.read()
     val status = ui.text(if (savedKey == null) "Add your personal SteamGridDB API key to choose custom game covers." else "Your saved API key is shown below. You can edit or replace it.", 14)
     val input = ui.input("API key", password = true).apply {

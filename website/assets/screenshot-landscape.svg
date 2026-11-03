@@ -1,0 +1,179 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="1120"
+  height="580"
+  viewBox="0 0 1120 580"
+  role="img"
+  aria-labelledby="title desc"
+>
+  <title id="title">Landscape details placeholder</title>
+  <desc id="desc">
+    Illustrative game details for the fictional game Lunar Drift.
+  </desc>
+  <defs>
+    <linearGradient id="space" x2="0.8" y2="1">
+      <stop stop-color="#162c55" />
+      <stop offset="1" stop-color="#607b9b" />
+    </linearGradient>
+    <linearGradient id="forest" x2="0" y2="1">
+      <stop stop-color="#98baae" />
+      <stop offset="1" stop-color="#183e3b" />
+    </linearGradient>
+    <linearGradient id="sun" x2="0" y2="1">
+      <stop stop-color="#eed3a7" />
+      <stop offset="1" stop-color="#bc7559" />
+    </linearGradient>
+    <linearGradient id="sea" x2="0.7" y2="1">
+      <stop stop-color="#6ab8c7" />
+      <stop offset="1" stop-color="#254969" />
+    </linearGradient>
+    <clipPath id="cover"><rect width="150" height="210" rx="8" /></clipPath>
+    <symbol id="lunar" viewBox="0 0 150 210">
+      <g clip-path="url(#cover)">
+        <path fill="url(#space)" d="M0 0h150v210H0z" />
+        <circle cx="104" cy="56" r="33" fill="#d6e5eb" />
+        <circle cx="94" cy="48" r="7" fill="#bacfd8" />
+        <circle cx="114" cy="66" r="10" fill="#bacfd8" />
+        <path d="m-12 150 59-64 60 83 32-51 35 92H0" fill="#30465f" />
+        <path d="m-10 184 70-54 111 80H0" fill="#132d48" />
+        <path
+          d="m33 54 2 2m-9 23 1 1m43-52 1 1m57 69 1 1"
+          stroke="#fff"
+          stroke-width="2"
+        />
+        <text
+          x="14"
+          y="168"
+          fill="#fff"
+          font-size="18"
+          font-weight="600"
+          letter-spacing="1"
+        >
+          LUNAR
+        </text>
+        <text x="14" y="188" fill="#fff" font-size="18" letter-spacing="3">
+          DRIFT
+        </text>
+      </g>
+    </symbol>
+    <symbol id="wildwood" viewBox="0 0 150 210">
+      <g clip-path="url(#cover)">
+        <path fill="url(#forest)" d="M0 0h150v210H0z" />
+        <circle cx="91" cy="54" r="28" fill="#dee7c7" />
+        <path
+          d="m-10 156 40-96 38 96m-23 12 36-104 43 104m-14 0 32-111 39 111"
+          fill="#33594a"
+        />
+        <path
+          d="m-10 210 39-111 43 111m-15 0 40-110 39 110m-12 0 28-84 33 84"
+          fill="#1a3e36"
+        />
+        <path d="m72 210 4-33 13-24-3 30 15 27" fill="#a5c1a3" />
+        <text
+          x="75"
+          y="64"
+          text-anchor="middle"
+          fill="#183e3b"
+          font-size="16"
+          font-weight="600"
+          letter-spacing="1"
+        >
+          WILDWOOD
+        </text>
+      </g>
+    </symbol>
+    <symbol id="sunward" viewBox="0 0 150 210">
+      <g clip-path="url(#cover)">
+        <path fill="url(#sun)" d="M0 0h150v210H0z" />
+        <circle cx="96" cy="76" r="30" fill="#fff0c5" />
+        <path d="M0 136q45-36 91 1t70-2v75H0" fill="#cf9672" />
+        <path d="M0 176q50-55 100-22t60-3v59H0" fill="#a96c55" />
+        <path d="M0 195q50-32 100-10t60-1v26H0" fill="#805341" />
+        <text
+          x="75"
+          y="47"
+          text-anchor="middle"
+          fill="#6e4938"
+          font-size="19"
+          letter-spacing="1"
+        >
+          SUNWARD
+        </text>
+        <path
+          d="m55 150 6-17 6 17m-6-17v27"
+          stroke="#644338"
+          stroke-width="2"
+        />
+      </g>
+    </symbol>
+    <symbol id="deepblue" viewBox="0 0 150 210">
+      <g clip-path="url(#cover)">
+        <path fill="url(#sea)" d="M0 0h150v210H0z" />
+        <path
+          d="m40 0 20 150L95 0m8 0 2 110L135 0"
+          fill="#b2e2e4"
+          opacity=".2"
+        />
+        <path d="M0 180q30-50 45-20t35-3 70-17v70H0" fill="#18485a" />
+        <path d="m46 87 21-8 15 8-15 8z" fill="#d2eff0" />
+        <path d="m81 106 21-7 15 7-15 7z" fill="#d2eff0" />
+        <text x="15" y="40" fill="white" font-size="17" letter-spacing="1">
+          DEEP BLUE
+        </text>
+      </g>
+    </symbol>
+  </defs>
+  <style>
+    text {
+      font-family: Arial, sans-serif;
+    }
+    .ink {
+      fill: #202124;
+    }
+    .muted {
+      fill: #5f6368;
+    }
+    .blue {
+      fill: #0b57d0;
+    }
+  </style>
+  <rect width="1120" height="580" rx="16" fill="white" />
+  <path d="m36 25-10 10 10 10m-10-10h24" stroke="#202124" stroke-width="2" />
+  <text x="68" y="43" font-size="21" class="ink">Lunar Drift</text>
+  <g fill="#5f6368">
+    <circle cx="1080" cy="27" r="2" />
+    <circle cx="1080" cy="34" r="2" />
+    <circle cx="1080" cy="41" r="2" />
+  </g>
+  <path d="M0 70h1120" stroke="#e8edf3" />
+  <use href="#lunar" x="30" y="96" width="250" height="350" />
+  <rect x="30" y="464" width="250" height="40" rx="20" fill="#e8f0fe" />
+  <text x="155" y="490" text-anchor="middle" font-size="13" class="blue">
+    ✓ Play next
+  </text>
+  <text x="318" y="119" font-size="12" class="muted">STEAM</text>
+  <text x="316" y="165" font-size="38" class="ink">Lunar Drift</text>
+  <text x="318" y="197" font-size="15" class="muted">
+    An adventure beyond the familiar.
+  </text>
+  <rect x="318" y="223" width="160" height="71" rx="14" fill="#f0f4f9" />
+  <text x="334" y="248" font-size="11" class="muted">TIME TO BEAT</text>
+  <text x="334" y="276" font-size="22" class="ink">12 hours</text>
+  <rect x="490" y="223" width="160" height="71" rx="14" fill="#f0f4f9" />
+  <text x="506" y="248" font-size="11" class="muted">METASCORE</text>
+  <text x="506" y="276" font-size="22" class="blue">86</text>
+  <text x="318" y="338" font-size="18" class="ink">Screenshots</text>
+  <svg x="318" y="356" width="360" height="165" viewBox="0 0 360 165">
+    <rect width="360" height="165" rx="9" fill="url(#space)" />
+    <circle cx="264" cy="52" r="30" fill="#dae5e9" />
+    <path d="m0 145 87-105 101 125 69-88 103 88H0" fill="#324d65" />
+    <path d="m0 165 75-41 86 41 77-38 122 38" fill="#19364e" />
+  </svg>
+  <svg x="692" y="356" width="360" height="165" viewBox="0 0 360 165">
+    <rect width="360" height="165" rx="9" fill="#7895aa" />
+    <circle cx="88" cy="43" r="21" fill="#e6edf0" />
+    <path d="m0 147 49-40 37 27 63-100 102 131 46-61 63 61H0" fill="#49677d" />
+    <path d="m0 165 98-46 77 46 109-34 76 34" fill="#26485f" />
+  </svg>
+  <rect x="460" y="558" width="200" height="4" rx="2" fill="#202124" />
+</svg>

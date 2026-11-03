@@ -21,6 +21,10 @@ You’ll need an internet connection to connect accounts, update your collection
 
 GameFibre runs on **Android 10 or newer**.
 
+The production app checks GitHub for updates once a day while in use. You can
+dismiss the update prompt and download it later from the hamburger menu. Open
+the downloaded APK to install it over the existing app and keep your saved data.
+
 **Privacy and security:** GameFibre doesn’t save your passwords or sign-in codes. To keep accounts connected, it saves refresh tokens—store-issued passes that renew your sign-in—and account IDs, encrypted using Android Keystore. Access tokens stay in memory. Your collection and preferences are stored locally on your device; signing out removes that store’s saved session. If you use SteamGridDB, your API key is also stored encrypted on your device.
 
 [Visit gamefibre.com](https://gamefibre.com)

@@ -58,6 +58,7 @@ class MainActivity : AppCompatActivity() {
         if (uri != null) startCollectionTransfer(uri, "import")
     }
     private lateinit var ui: NativeUi
+    private val appUpdatePrompt by lazy { AppUpdatePrompt(this, ui, scope, ::openUrl) }
     private lateinit var engine: SteamEngine
     private lateinit var customArtwork: CustomArtwork
     private val batchArtworkModel by lazy { androidx.lifecycle.ViewModelProvider(this)[BatchArtworkModel::class.java] }
@@ -182,7 +183,6 @@ class MainActivity : AppCompatActivity() {
     private var retainedLibrary: LibraryScreen? = null
     private lateinit var root: LinearLayout
     private lateinit var header: LinearLayout
-    private var gameHeaderStores: LinearLayout? = null
     private lateinit var appBar: AppBarLayout
     private lateinit var toolbarContent: LinearLayout
     private lateinit var libraryControls: LinearLayout
@@ -236,7 +236,6 @@ class MainActivity : AppCompatActivity() {
             else -> androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         })
         super.onCreate(savedInstanceState)
-        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         ui = NativeUi(this)
         customArtwork = CustomArtwork(this)
@@ -389,6 +388,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume(); engine.refreshAuthentication(); assetRepository.resume(); render(engine.snapshot()); pageVideos?.resume()
     }
+    override fun onPostResume() { super.onPostResume(); appUpdatePrompt.onResume() }
     override fun onPause() { pageVideos?.pause(); super.onPause() }
     override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
         super.onConfigurationChanged(newConfig)
@@ -425,6 +425,7 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onStop() { tagObservation?.cancel(); tagObservation = null; assetObservation?.cancel(); assetObservation=null; networkRequested = false; observing = false; engine.removeObserver(observer); storeSubscription?.cancel(); storeSubscription=null; accountSubscription?.cancel(); accountSubscription=null; super.onStop() }
     override fun onDestroy() {
+        appUpdatePrompt.close()
         storeSearchView?.close()
         pageVideos?.dispose(); pageVideos = null
         batchArtworkDialog?.dismiss(); transferDialog?.dismiss(); fullscreenDialog?.dismiss(); collectionMenu?.dismiss(); downloadDialog?.dismiss(); dialogUpdate = null; scope.cancel(); super.onDestroy()
@@ -543,6 +544,7 @@ class MainActivity : AppCompatActivity() {
             android.util.Log.d("LibraryPerf", "$stage ${android.os.SystemClock.elapsedRealtime() - started}ms $extra")
     }
     private fun render(value: JSONObject, force: Boolean = false) {
+        window.protectScreenCapture(tab == "accounts")
         val renderStarted = android.os.SystemClock.elapsedRealtime()
         state = value
         collection.refresh()
@@ -672,7 +674,6 @@ class MainActivity : AppCompatActivity() {
             selectedLibraryKeys.isEmpty()) View.VISIBLE else View.GONE
         header.removeAllViews(); header.tag = "$tab:$steamSignIn:${collection.list}"
         tagFilterBar = null
-        gameHeaderStores = null
         searchGameCount = null
         selectionCount = null
         selectAllButton = null
@@ -760,8 +761,7 @@ class MainActivity : AppCompatActivity() {
             }
         } else {
             if (tab == "game") {
-                gameHeaderStores = ui.row().apply { gravity = Gravity.END or Gravity.CENTER_VERTICAL }
-                top.addView(gameHeaderStores, LinearLayout.LayoutParams(0, ui.dp(48), 1f))
+                top.addView(Space(this), LinearLayout.LayoutParams(0, ui.dp(48), 1f))
                 top.addView(ui.iconButton(R.drawable.ic_more_vertical, "Game actions", ::showGameActions).apply { tag = "game-actions" })
             } else {
                 top.addView(ui.text(if (tab == "store") "Steam search" else if (steamSignIn) "Connect Steam" else if (tab == "settings") "Settings" else "Accounts", 20, medium = true).apply {
@@ -1444,7 +1444,7 @@ class MainActivity : AppCompatActivity() {
             val removed = collection.wishlistGames().filter { it.key in keys }
             collection.removeWishlist(keys)
             clearLibrarySelection(); render(state, true)
-            com.google.android.material.snackbar.Snackbar.make(root, "Removed ${removed.size} games from wishlist", com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
+            appSnackbar(root, "Removed ${removed.size} games from wishlist", com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
                 .setAction("Undo") { collection.addWishlist(removed); render(state, true) }.show()
             return
         }
@@ -1461,7 +1461,7 @@ class MainActivity : AppCompatActivity() {
             selectedProgress?.let { collection.setProgress(keys, it) }
             clearLibrarySelection()
             updateLibrary(true)
-            com.google.android.material.snackbar.Snackbar.make(root,
+            appSnackbar(root,
                 "Updated ${games.size} ${if (games.size == 1) "game" else "games"}", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show()
         }
         val add = ui.button("Apply", true) {
@@ -1698,7 +1698,7 @@ class MainActivity : AppCompatActivity() {
                     if (game.store == LibraryStore.STEAM) engine.removeFinishedDownload() else storeDownloads.removeFinishedDownload()
                 }
                 collection.forget(game.key); render(state, true)
-                com.google.android.material.snackbar.Snackbar.make(root,
+                appSnackbar(root,
                     "Removed from list. Files kept on device.", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show()
             } })
     }
@@ -1879,7 +1879,7 @@ class MainActivity : AppCompatActivity() {
                 collection.list = WishlistItems.LIST; selectTab("library")
             }
             render(state, true)
-            com.google.android.material.snackbar.Snackbar.make(root, "Removed from wishlist", com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
+            appSnackbar(root, "Removed from wishlist", com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
                 .setAction("Undo") { collection.addWishlist(removed); render(state, true) }.show()
         }
     }
@@ -2014,7 +2014,8 @@ class MainActivity : AppCompatActivity() {
         item("Steam search", tab == "store" || (tab == "game" && gameReturnTab == "store")) { selectTab("store") }
         item("Accounts", tab == "accounts") { selectTab("accounts") }
         item("Settings", tab == "settings") { selectTab("settings") }
-        drawer.window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        if (appUpdatePrompt.enabled) item(appUpdatePrompt.menuLabel) { appUpdatePrompt.fromMenu() }
+        drawer.window?.protectScreenCapture(isScreenCaptureProtected())
         drawer.window?.setBackgroundDrawableResource(android.R.color.transparent)
         drawer.show()
         drawer.window?.apply { setGravity(Gravity.START or Gravity.TOP); setLayout(ui.dp(340).coerceAtMost(resources.displayMetrics.widthPixels - ui.dp(32)), -1) }
@@ -2337,7 +2338,7 @@ class MainActivity : AppCompatActivity() {
         updateLibrary(true)
         val message = if (games.size == 1) { if (hidden) "Game hidden" else "Game unhidden" }
             else if (hidden) "Games hidden" else "Games unhidden"
-        com.google.android.material.snackbar.Snackbar.make(root, message, com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
+        appSnackbar(root, message, com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
             .setAction("Undo") {
                 collection.setMembership(CollectionData.HIDDEN_LIST, keys - previouslyHidden, false)
                 collection.setMembership(CollectionData.HIDDEN_LIST, previouslyHidden, true)
@@ -2365,7 +2366,7 @@ class MainActivity : AppCompatActivity() {
                     try { applyCoverArtwork(keys, choice) }
                     catch (error: CancellationException) { throw error }
                     catch (error: Exception) {
-                        com.google.android.material.snackbar.Snackbar.make(root,
+                        appSnackbar(root,
                             error.message ?: "Could not save cover.",
                             com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
                             .setAction("Retry") { changeCoverArtwork(game) }.show()
@@ -2410,7 +2411,7 @@ class MainActivity : AppCompatActivity() {
                 val keys = fresh.flatMap { it.appliedKeys }.toSet()
                 if (keys.isNotEmpty()) refreshCustomArtwork(keys)
                 if (!status.running && batchArtworkDialog?.isShowing != true && !isFinishing && !isDestroyed) {
-                    com.google.android.material.snackbar.Snackbar.make(root, status.message,
+                    appSnackbar(root, status.message,
                         com.google.android.material.snackbar.Snackbar.LENGTH_LONG).show()
                 }
                 !status.running
@@ -2424,7 +2425,7 @@ class MainActivity : AppCompatActivity() {
         batchArtworkDialog = showBatchArtworkDialog(this, ui, scope, batch) {
             batchArtworkDialog = null
             if (batch.status.value?.running == true && !isFinishing && !isDestroyed && !isChangingConfigurations) {
-                com.google.android.material.snackbar.Snackbar.make(root,
+                appSnackbar(root,
                     "Applying artwork · continues while browsing",
                     com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
                     .setAction("View") { showArtworkProgress() }.show()
@@ -2434,7 +2435,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun renderGamePage(game: LibraryEntry, preview: Boolean = false): ScrollView {
         val sources = ownedCopies(game).sortedWith(compareBy<LibraryEntry> { customArtwork.address(it.key) == null }.thenBy { it.store.ordinal })
-        fun chosenSource() = sources.firstOrNull { it.key == downloadSourceKey } ?: sources.firstOrNull { it.store.downloads } ?: sources.first()
+        var sourceKey = downloadSourceKey
+        fun chosenSource() = sources.firstOrNull { it.key == sourceKey } ?: sources.firstOrNull { it.store.downloads } ?: sources.first()
         if (!preview) downloadSourceKey = chosenSource().key
         // Previews use the same layout, without changing the selected page or its subscriptions.
         val content = if (preview) scrollColumn(if (landscape) 16 else 20, target = FrameLayout(this))
@@ -2535,36 +2537,6 @@ class MainActivity : AppCompatActivity() {
         if(assetRepository.published(game)?.currentAccess==false) {
             ui.add(info,ui.text("Kept offline · missing from the latest store snapshot. Access needs checking.",12,ui.secondary))
         }
-        val stores = ui.row()
-        val storeButtons = linkedMapOf<String, LinearLayout>()
-        lateinit var download: LinearLayout
-        fun isDownloaded() = transferCards()[chosenSource().key]?.phase == "complete" ||
-            collection.output(chosenSource().key).isNotBlank()
-        fun updateSource() {
-            storeButtons.forEach { (key, button) ->
-                button.isSelected = key == chosenSource().key
-                button.background = ui.shape(if (button.isSelected) ui.paleBlue else Color.TRANSPARENT, 16)
-            }
-            val downloaded = isDownloaded()
-            val label = if (!isOwned(chosenSource()) || !chosenSource().store.downloads) "View on ${chosenSource().store.label}" else if (downloaded) "Open Downloads" else "Download from ${chosenSource().store.label}"
-            (download.getChildAt(0) as ImageView).setImageResource(if (!isOwned(chosenSource()) || !chosenSource().store.downloads) R.drawable.ic_gamepad_2 else if (downloaded) R.drawable.ic_folder_open else R.drawable.ic_download)
-            (download.getChildAt(download.childCount - 1) as TextView).text = label
-            download.contentDescription = label
-        }
-        sources.forEach { source ->
-            val button = compactLibraryButton(if (source.remote?.xboxAccess == XboxAccess.GAME_PASS) "Game Pass" else source.store.label) { downloadSourceKey = source.key; updateSource() }
-            storeButtons[source.key] = button
-            stores.addView(button, LinearLayout.LayoutParams(-2, ui.dp(48)).apply { marginEnd = ui.dp(4) })
-        }
-        if (!preview) gameHeaderStores?.apply {
-            removeAllViews()
-            if (sources.size > 1) addView(HorizontalScrollView(this@MainActivity).apply {
-                isHorizontalScrollBarEnabled = false
-                isFillViewport = true
-                stores.gravity = Gravity.END or Gravity.CENTER_VERTICAL
-                addView(stores, ViewGroup.LayoutParams(-2, -1))
-            }, LinearLayout.LayoutParams(-1, -1))
-        }
         val localActions = ui.column()
         val listChips = CenteredChipGroup(this)
         fun updateListChips() {
@@ -2595,13 +2567,15 @@ class MainActivity : AppCompatActivity() {
         ui.gap(info, 12)
         ui.add(info, localActions)
         ui.gap(info, 12)
-        download = ui.button("Download", true, R.drawable.ic_download) {
-            downloadGame(chosenSource())
-        }
-        if (!preview) pageDownloadUpdate = ::updateSource
-        updateSource(); ui.add(info, download)
+        val storeActions = GameStoreActions(this, ui, sources, ::chosenSource,
+            select = { source -> sourceKey = source.key; if (!preview) downloadSourceKey = source.key },
+            owned = ::isOwned,
+            downloaded = { source -> transferCards()[source.key]?.phase == "complete" || collection.output(source.key).isNotBlank() },
+            action = ::downloadGame)
+        if (!preview) pageDownloadUpdate = storeActions::update
+        ui.add(info, storeActions)
         heroActionsHeight = { width ->
-            listOf(title, localActions, download).sumOf { view ->
+            listOf(title, localActions, storeActions).sumOf { view ->
                 view.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
                 view.measuredHeight
             } + ui.dp(24)
@@ -2955,7 +2929,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun showModal(dialog: Dialog) {
         dialog.show()
-        dialog.window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
     }
 
     private fun showDownload(game: LibraryEntry) {

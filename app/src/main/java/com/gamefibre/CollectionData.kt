@@ -97,7 +97,7 @@ internal class CollectionData(val preferences: android.content.SharedPreferences
         get() = preferences.getBoolean("show-game-pass", true)
         set(value) { preferences.edit().putBoolean("show-game-pass", value).apply() }
     var tileSize: String
-        get() = preferences.getString("tiles", "Medium")!!
+        get() = preferences.getString("tiles", "Small")!!
         set(value) { preferences.edit().putString("tiles", value).apply() }
     var sort: String
         get() = preferences.getString("sort", "Name")!!

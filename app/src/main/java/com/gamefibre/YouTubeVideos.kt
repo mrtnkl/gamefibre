@@ -233,7 +233,7 @@ internal class YouTubeVideos(private val activity: AppCompatActivity, parent: Co
             saved?.onCustomViewHidden()
             if (!disposed) fullscreenClosed()
         }
-        dialog.window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        dialog.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         dialog.show()
         dialog.window?.let { window ->
             window.setLayout(-1, -1)

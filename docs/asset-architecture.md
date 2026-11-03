@@ -40,16 +40,20 @@ The replacement does not read obsolete artwork caches, migrate their contents, o
 
 ## Verification
 
+Debug builds install as **GameFibre Dev** (`com.gamefibre.debug`) alongside
+the release app (`com.gamefibre`). Each app keeps its own accounts and local data;
+sign in once in each app. The debug instrumentation targets only the dev app.
+
 ```sh
 ./gradlew testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
-adb shell am instrument -w com.gamefibre.test/com.gamefibre.ArtworkAuditInstrumentation
+adb shell am instrument -w com.gamefibre.debug.test/com.gamefibre.ArtworkAuditInstrumentation
 # Native fling distance and diagonal upward touch regression:
-adb shell am instrument -w -e mode scroll com.gamefibre.test/com.gamefibre.ArtworkAuditInstrumentation
+adb shell am instrument -w -e mode scroll com.gamefibre.debug.test/com.gamefibre.ArtworkAuditInstrumentation
 # Run with the phone disconnected from networks for cold offline validation:
-adb shell am force-stop com.gamefibre
-adb shell am instrument -w -e mode offline com.gamefibre.test/com.gamefibre.ArtworkAuditInstrumentation
+adb shell am force-stop com.gamefibre.debug
+adb shell am instrument -w -e mode offline com.gamefibre.debug.test/com.gamefibre.ArtworkAuditInstrumentation
 ```
 
 Unlock the device before starting the instrumentation. Instrumentation uses isolated fixture databases for transaction, stale/account/group guards, failure retention, deduplication, restart, and cleanup checks. It then audits visible card images on every observed pre-draw while navigating actual account libraries, scrolling, jumping deep into lists, performing touch swipes, and refreshing. Its offline mode disables image transport before Activity launch and asserts no image HTTP. The test window stays awake during the run and releases that flag afterward. It reports frame counts, timing, heap usage, and unresolved titles. No app database or account is cleared by these tests.
