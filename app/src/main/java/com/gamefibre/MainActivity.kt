@@ -2314,6 +2314,7 @@ class MainActivity : AppCompatActivity() {
         val downloaded = transferCards()[source.key]?.phase == "complete" || collection.output(source.key).isNotBlank()
         androidx.appcompat.widget.PopupMenu(this, anchor).apply {
             menu.add(0, 2, 0, if (!isOwned(source) || !source.store.downloads) "View on ${source.store.label}" else if (downloaded) "Open Downloads" else "Download from ${source.store.label}")
+            if (downloaded && isOwned(source) && source.store.downloads) menu.add(0, 9, 0, "Download again")
             if (isOwned(game)) menu.add(0, 3, 1, "Set progress: ${gameProgress(game).label}")
             if (gameReturnTab != "store" || isOwned(game)) menu.add(0, 4, 2, "Set lists")
             menu.add(0, 1, 3, "Change cover art")
@@ -2324,6 +2325,7 @@ class MainActivity : AppCompatActivity() {
                 when (item.itemId) {
                     1 -> changeCoverArtwork(game)
                     2 -> downloadGame(source)
+                    9 -> showDownload(source)
                     3 -> showGameProgress(game) { render(state, true) }
                     4 -> showGameLists(game)
                     5 -> changeGameVisibility(listOf(game), hidden = !gameIsHidden(game))
@@ -2634,7 +2636,7 @@ class MainActivity : AppCompatActivity() {
             select = { source -> sourceKey = source.key; if (!preview) downloadSourceKey = source.key },
             owned = ::isOwned,
             downloaded = { source -> transferCards()[source.key]?.phase == "complete" || collection.output(source.key).isNotBlank() },
-            action = ::downloadGame)
+            action = ::downloadGame, redownload = ::showDownload)
         if (!preview) pageDownloadUpdate = storeActions::update
         ui.add(info, storeActions)
         heroActionsHeight = { width ->
