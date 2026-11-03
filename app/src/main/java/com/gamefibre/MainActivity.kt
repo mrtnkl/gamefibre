@@ -41,6 +41,7 @@ import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import org.json.JSONObject
 import java.util.Locale
@@ -207,7 +208,9 @@ class MainActivity : AppCompatActivity() {
     private var dialogUpdate: (() -> Unit)? = null
     private var permissionAction: (() -> Unit)? = null
     private var observing = false
-    private val observer: (JSONObject) -> Unit = { runOnUiThread { if (observing) render(it) } }
+    private val steamUpdates = MutableStateFlow<JSONObject?>(null)
+    private var steamSubscription: Job? = null
+    private val observer: (JSONObject) -> Unit = { steamUpdates.value = it }
     private val wide get() = resources.configuration.screenWidthDp >= 760
     private val landscape get() = resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
     private fun libraryColumns(name: String): Int {
@@ -377,7 +380,17 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart(); networkRequested = true; observing = true; engine.observe(observer); render(engine.snapshot())
         assetObservation=scope.launch { assetRepository.library.collect { if (observing) render(engine.snapshot()) } }
-        storeSubscription=scope.launch { storeDownloads.state.collect { render(state) } }
+        steamUpdates.value = engine.snapshot()
+        steamSubscription = scope.launch { steamUpdates.collect { value -> if (value != null) renderSteamUpdate(value) } }
+        storeSubscription = scope.launch {
+            var previous: StoreTransfer? = null
+            storeDownloads.state.collect { value ->
+                if (previous != null && value != null && previous?.request == value.request && previous?.phase == value.phase) {
+                    updateTransferViews()
+                } else render(engine.snapshot())
+                previous = value
+            }
+        }
         accountSubscription=scope.launch { accounts.state.collect { render(state) } }
         tagObservation = scope.launch { liveSteamTags.revision.collect {
             if (tab == "library") updateLibrary(true)
@@ -427,7 +440,7 @@ class MainActivity : AppCompatActivity() {
             if (videoLayoutPending && pageVideos?.isFullscreen == false) rebuildVideoLayout()
         }
     }
-    override fun onStop() { tagObservation?.cancel(); tagObservation = null; assetObservation?.cancel(); assetObservation=null; networkRequested = false; observing = false; engine.removeObserver(observer); storeSubscription?.cancel(); storeSubscription=null; accountSubscription?.cancel(); accountSubscription=null; super.onStop() }
+    override fun onStop() { steamSubscription?.cancel(); steamSubscription = null; tagObservation?.cancel(); tagObservation = null; assetObservation?.cancel(); assetObservation=null; networkRequested = false; observing = false; engine.removeObserver(observer); storeSubscription?.cancel(); storeSubscription=null; accountSubscription?.cancel(); accountSubscription=null; super.onStop() }
     override fun onDestroy() {
         appUpdatePrompt.close()
         storeSearchView?.close()
@@ -653,12 +666,29 @@ class MainActivity : AppCompatActivity() {
         }
         if (tab == "library") {
             updateLibrary(gamesChanged || collection.list == "Downloads")
-            retainedLibrary?.pages?.values?.forEach { page ->
-                if (page.name != "Downloads") return@forEach
-                val recycler = page.recycler
-                for (index in 0 until recycler.childCount) (recycler.getChildViewHolder(recycler.getChildAt(index)) as? GameHolder)?.let { holder ->
-                    holder.boundGame?.let { bindLibraryProgress(holder.progress, it, page.name) }
-                }
+        }
+        updateTransferViews()
+        logPerformance("render", renderStarted, "tab=$tab force=$force")
+    }
+
+    /** Progress never rebuilds the library or its navigation controls. */
+    private fun renderSteamUpdate(value: JSONObject) {
+        val oldTransfer = state.optJSONObject("transfer")
+        val newTransfer = value.optJSONObject("transfer")
+        if (screenKey.isNotEmpty() && value.optLong("contentRevision") == state.optLong("contentRevision") &&
+            oldTransfer?.optInt("appId") == newTransfer?.optInt("appId") &&
+            oldTransfer?.optString("phase") == newTransfer?.optString("phase")) {
+            state = value
+            updateTransferViews()
+        } else render(value)
+    }
+
+    private fun updateTransferViews() {
+        if (tab == "library") retainedLibrary?.pages?.values?.forEach { page ->
+            if (page.name != "Downloads") return@forEach
+            val recycler = page.recycler
+            for (index in 0 until recycler.childCount) (recycler.getChildViewHolder(recycler.getChildAt(index)) as? GameHolder)?.let { holder ->
+                holder.boundGame?.let { bindLibraryProgress(holder.progress, it, page.name) }
             }
         }
         if (tab == "game") {
@@ -666,7 +696,6 @@ class MainActivity : AppCompatActivity() {
             selectedEntry?.let { game -> pageProgress?.let { bindProgress(it, game, hideCompleted = true) } }
         }
         dialogUpdate?.invoke()
-        logPerformance("render", renderStarted, "tab=$tab force=$force")
     }
 
     private fun renderHeader() {

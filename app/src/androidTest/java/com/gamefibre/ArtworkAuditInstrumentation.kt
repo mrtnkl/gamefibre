@@ -239,6 +239,17 @@ class ArtworkAuditInstrumentation:Instrumentation() {
             }
             return
         }
+        if(mode=="download-ui") {
+            try {
+                val screen=startActivitySync(Intent(targetContext,MainActivity::class.java).apply{addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)})
+                output.putString("result",DownloadUiAudit.run(this,screen))
+                finish(Activity.RESULT_OK,output)
+            } catch(error:Throwable) {
+                output.putString("result","FAIL: ${error.stackTraceToString()}")
+                finish(Activity.RESULT_CANCELED,output)
+            }
+            return
+        }
         if(mode=="startup-reconnect") {
             try {
                 output.putString("result",StartupReconnectAudit.run(this))

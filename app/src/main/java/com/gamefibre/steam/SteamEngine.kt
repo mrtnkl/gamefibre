@@ -72,6 +72,7 @@ class SteamEngine internal constructor(private val context: android.app.Applicat
     private var stagingCleanup: Job? = null
     private val cleanup = AccountCleanup(context)
     private var lastCheckpointSave = 0L
+    private val progressPublication = ProgressPublication { android.os.SystemClock.elapsedRealtime() }
     private var licenses = CompletableDeferred<List<License>>()
     @Volatile private var authSession: AuthSession? = null
     @Volatile private var guardFlow: SteamGuardFlow<AuthPollResult>? = null
@@ -106,10 +107,11 @@ class SteamEngine internal constructor(private val context: android.app.Applicat
     /** The last published copy. Consumers treat it as read-only; it is shared by every observer and snapshot reader. */
     @Volatile private var published: JSONObject = JSONObject(state.toString())
     fun snapshot(): JSONObject = published
-    private fun update(block: (JSONObject) -> Unit) {
+    private fun update(transferOnly: Boolean = false, block: (JSONObject) -> Unit) {
         val copy = synchronized(lock) {
             val previousGames = state.optJSONArray("games")
             block(state)
+            if (!transferOnly) state.put("contentRevision", state.optLong("contentRevision") + 1)
             if (previousGames !== state.optJSONArray("games")) state.put("libraryRevision", state.optLong("libraryRevision") + 1)
             JSONObject(state.toString()).also { published = it }
         }
@@ -695,9 +697,14 @@ class SteamEngine internal constructor(private val context: android.app.Applicat
         .put("resuming", resumeAfterReconnect.pending == value.request)
         .put("canResume", value.phase.resumable && !transferBusy.get() && resumeAfterReconnect.pending == null)
         .put("canPause", value.phase in setOf(DownloadPhase.PREPARING, DownloadPhase.DOWNLOADING) && transferBusy.get())
-    private fun publishTransfer() { checkpoint?.let { value -> update { it.put("transfer", transferJson(value)) } } }
+    private fun publishTransfer(force: Boolean = true) {
+        if (!progressPublication.allow(force)) return
+        checkpoint?.let { value -> update(transferOnly = true) { it.put("transfer", transferJson(value)) } }
+    }
     private fun saveTransfer(value: DownloadCheckpoint, durable: Boolean) {
         val now = android.os.SystemClock.elapsedRealtime()
+        val previous = checkpoint
+        if (!durable && previous == value) return
         checkpoint = value
         if (durable || now - lastCheckpointSave >= 1000) {
             try {
@@ -707,6 +714,6 @@ class SteamEngine internal constructor(private val context: android.app.Applicat
                 update { it.put("error", "Could not save the latest download progress. Check free device storage before closing the app.") }
             }
         }
-        publishTransfer()
+        publishTransfer(force = durable || previous?.phase != value.phase)
     }
 }
