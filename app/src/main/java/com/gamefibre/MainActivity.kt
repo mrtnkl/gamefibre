@@ -2051,6 +2051,11 @@ class MainActivity : AppCompatActivity() {
         val content = ui.column(20).apply { setBackgroundColor(ui.background) }
         scroll.addView(content)
         menu.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
+        val version = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty()
+        menu.addView(ui.text("Version $version", 12, ui.secondary).apply {
+            gravity = Gravity.CENTER_HORIZONTAL
+            setPadding(ui.dp(20), ui.dp(8), ui.dp(20), ui.dp(20))
+        }, LinearLayout.LayoutParams(-1, -2))
         drawer.setContentView(menu)
         val heading = ui.row()
         heading.addView(ui.text("Your collection", 22, medium = true), LinearLayout.LayoutParams(0, -2, 1f))
