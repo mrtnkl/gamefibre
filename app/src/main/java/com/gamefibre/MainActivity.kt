@@ -79,6 +79,11 @@ class MainActivity : AppCompatActivity() {
     private var storeSearchView: StoreSearchView? = null
     private var storeSearchState: Bundle? = null
     private var libraryMetascores = emptyMap<Int, Int>()
+    private var metascoreInput: MergedLibrary? = null
+    private var metascoreResult: MergedLibrary? = null
+    private var metascoreSource: Map<Int, Int>? = null
+    private var metascoreIndex: BeatIndex? = null
+    private var metascoreDataRevision = -1L
     private var storeCatalog: SteamCatalog? = null
     private var storeCatalogJob: Job? = null
     private var gameReturnTab = "library"
@@ -560,6 +565,25 @@ class MainActivity : AppCompatActivity() {
         if (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0)
             android.util.Log.d("LibraryPerf", "$stage ${android.os.SystemClock.elapsedRealtime() - started}ms $extra")
     }
+    /** Account status and artwork publications do not change the metadata inputs. */
+    private fun enrichLibraryMetascores(library: MergedLibrary): MergedLibrary {
+        val previous = metascoreInput
+        val dataRevision = collection.preferences.getLong("data-revision", 0)
+        if (metascoreSource === libraryMetascores && metascoreIndex === beatIndex &&
+            metascoreDataRevision == dataRevision && previous != null &&
+            previous.owned == library.owned && previous.combined == library.combined &&
+            previous.wishlistKeys == library.wishlistKeys && previous.observedKeys == library.observedKeys) {
+            metascoreResult?.let { return it }
+        }
+        return collection.enrichMetascores(library, libraryMetascores, ::communitySteamId).also {
+            metascoreInput = library
+            metascoreResult = it
+            metascoreSource = libraryMetascores
+            metascoreIndex = beatIndex
+            metascoreDataRevision = collection.preferences.getLong("data-revision", 0)
+        }
+    }
+
     private fun render(value: JSONObject, force: Boolean = false) {
         window.protectScreenCapture(tab == "accounts")
         val renderStarted = android.os.SystemClock.elapsedRealtime()
@@ -572,6 +596,7 @@ class MainActivity : AppCompatActivity() {
             if (games != allGames) {
                 allGames = games
                 steamEntries = games.map { LibraryEntry(LibraryStore.STEAM, it.appId.toString(), it.name, steam = it) }
+                beatIndex?.updateKnownSteamGames(steamEntries)
             }
         }
         LibraryStore.entries.filter { it.account != null }.forEach { source ->
@@ -582,12 +607,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
         val owners = libraryOwners()
-        val merged = collection.enrichMetascores(mergeLibrary(steamEntries, remoteEntries.values.flatten(), collection.libraryGames(), assetRepository.remembered(owners),
-            collection.wishlistGames(), collection.downloaded(), transferEntries()), libraryMetascores, ::communitySteamId)
+        val merged = enrichLibraryMetascores(mergeLibrary(steamEntries, remoteEntries.values.flatten(), collection.libraryGames(), assetRepository.remembered(owners),
+            collection.wishlistGames(), collection.downloaded(), transferEntries()))
         if (ownedLibrary != merged.owned) {
             ownedLibrary = merged.owned
             ownedTagRevision++
-            beatIndex?.updateKnownSteamGames(steamEntries)
             ownedKeys = merged.ownedKeys
             ownedByTitle = merged.ownedByTitle
         }
