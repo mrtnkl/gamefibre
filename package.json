@@ -4,6 +4,8 @@
   "private": true,
   "homepage": "https://gamefibre.com",
   "scripts": {
-    "install": "./gradlew assembleDebug && adb install -r app/build/outputs/apk/debug/app-debug.apk"
+    "install": "./gradlew assembleDebug && adb install -r app/build/outputs/apk/debug/app-debug.apk",
+    "install-pixel": "./gradlew assembleDebug && adb -s 43291JEHN11616 install -r app/build/outputs/apk/debug/app-debug.apk",
+    "install-thor": "./gradlew assembleDebug && adb -s 84eafc31 install -r app/build/outputs/apk/debug/app-debug.apk"
   }
 }

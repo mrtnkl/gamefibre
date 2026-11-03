@@ -43,7 +43,7 @@ internal class ContentDialog(context: Context, private val ui: NativeUi, title: 
 }
 
 internal fun showChoiceDialog(context: Context, ui: NativeUi, title: String, options: List<String>,
-    selected: Int? = null, choose: (Int) -> Unit) {
+    selected: Int? = null, choose: (Int) -> Unit): ContentDialog {
     val dialog = ContentDialog(context, ui, title)
     options.forEachIndexed { index, label ->
         val option = if (selected == null) ui.button(label) { dialog.dismiss(); choose(index) }
@@ -57,6 +57,7 @@ internal fun showChoiceDialog(context: Context, ui: NativeUi, title: String, opt
     }
     dialog.setActions(ui.button("Cancel") { dialog.dismiss() })
     dialog.show()
+    return dialog
 }
 
 /** Trailing actions sit side by side when they fit, and stack at narrow widths or large font sizes. */
