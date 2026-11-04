@@ -8,10 +8,10 @@
 
 <p align="center"><strong>Unified game library for Android</strong></p>
 
-GameFibre brings your Steam, GOG, Epic and Xbox games into one Android app. Browse
-covers, revisit games you haven't played in a while, and enjoy the collection you
-already own. The focus is on browsing and discovery, with lists and progress
-tracking there when you want them.
+<p align="center"><strong>Enjoy your collection.</strong></p>
+
+All your Steam, GOG, Epic and Xbox games in one beautiful, lightweight Android app.
+Made for browsing, rediscovering, and enjoying the games you own.
 
 <p align="center">
   <a href="https://github.com/mrtnkl/gamefibre/releases/latest"><strong>Download the latest APK</strong></a>
@@ -27,7 +27,7 @@ tracking there when you want them.
   <a href="https://gamefibre.com/assets/screenshot-03.jpg"><img src="https://gamefibre.com/assets/screenshot-03.jpg" width="30%" alt="GameFibre list view with game titles and Metascores" /></a>
 </p>
 
-[Features](#features) · [Privacy and security](#privacy-and-security) · [Build from source](#build-from-source)
+[Why GameFibre?](#why-gamefibre) · [Privacy and security](#privacy-and-security) · [Build from source](#build-from-source)
 
 ## Install and get started
 
@@ -47,33 +47,35 @@ The production app checks for updates once a day while in use. You can dismiss
 the prompt and download the update later from the app menu. Install the new APK
 over the existing app to keep your saved data.
 
-## Features
+## Why GameFibre?
 
-- **Offline browsing.** Keep browsing your saved collection, covers, game details
-  and lists without an internet connection.
-- **Custom artwork.** Choose alternative covers from SteamGridDB using your own
-  API key. Selected covers are saved on your device too.
-- **Favorites, lists and progress.** Mark favorites, create custom lists and swipe
-  between them. Track games as Unplayed, Play next, Playing, On hold or Finished.
-- **Sorting and discovery.** Sort your collection by Metascore, playtime or
-  HowLongToBeat estimates, or shuffle it to see a different selection.
-- **Game file downloads.** Download games you own on Steam, GOG or Epic to Android
-  as ZIP files or folders. Use the files with compatible ports and engines such
-  as OpenMW for Morrowind or DevilutionX for Diablo, following the engine's setup
-  instructions. Compatibility depends on the game and engine.
+GameFibre takes a simpler approach to game libraries. Less about statistics and
+managing backlogs, more about enjoying your collection.
+
+- **Offline first.** Your collection, covers and game details remain available
+  offline, even when store connections expire.
+- **Custom artwork.** Choose alternative game covers from SteamGridDB to
+  personalize your library.
+- **Favorites, lists and progress.** Mark favorites, create custom lists and track
+  which games you're playing or have completed.
+- **Sorting and discovery.** Sort by Metascore, playtime or HowLongToBeat, or
+  randomize your collection to find something unexpected.
+- **Download original game files.** Download games you own directly to Android as
+  ZIP files, for use with ports and engines like OpenMW (Morrowind) and DevilutionX
+  (Diablo).
 
 ### Also included
 
-- **Tag filtering.** Combine tags such as open world, first-person and RPG to
-  find games in your collection.
-- **HowLongToBeat.** See estimated completion times for the main story, extras
-  and completionist runs.
+- **Tag filtering.** Find games you own by combining tags like open world,
+  first-person and RPG.
+- **HowLongToBeat.** See estimated playtimes for the main story, extras and
+  completionist runs.
 - **Screenshots and videos.** Browse full-screen screenshots and watch YouTube
   videos for each game.
-- **Steam game search.** Search the Steam catalog with community tags and sort
-  results by user reviews.
-- **Wishlist.** Save games you'd like to get or import your existing Steam wishlist.
-- **Xbox Game Pass.** Browse games available through Game Pass.
+- **Steam game search.** Find new games by combining tags and sorting by user
+  reviews.
+- **Wishlist.** Add games to your wishlist or import your existing Steam wishlist.
+- **Xbox Game Pass.** Browse games available through Xbox Game Pass.
 
 An internet connection is needed to connect accounts, update your collection,
 download game files, watch videos or load media that hasn't been saved yet. Xbox
