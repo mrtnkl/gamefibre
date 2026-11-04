@@ -1,6 +1,7 @@
 package com.gamefibre
 
 import java.io.File
+import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -41,9 +42,11 @@ class SteamCatalogTest {
 
     @Test fun bundledCatalogHasOriginalNamesAndValidMetadata() {
         val catalog = File("src/main/assets/steam-catalog-v1.bin.xz").inputStream().use { SteamCatalog.read(it) { emptyList() } }
-        assertEquals(144498, catalog.games.size)
-        assertEquals(4282, catalog.games.count { it.metascore > 0 })
-        assertEquals(82988, catalog.games.count { it.reviewCount > 0 })
+        val manifest = JSONObject(File("src/main/assets/steam-catalog-v1.json").readText())
+        assertTrue(catalog.games.size > 100_000)
+        assertEquals(manifest.getInt("games"), catalog.games.size)
+        assertEquals(manifest.getInt("with_metascore"), catalog.games.count { it.metascore > 0 })
+        assertEquals(manifest.getInt("with_reviews"), catalog.games.count { it.reviewCount > 0 })
         assertTrue(catalog.games.zipWithNext().all { (a, b) -> a.appId < b.appId })
         val portal = catalog.games.first { it.appId == 620 }
         assertEquals("Portal 2", portal.name)

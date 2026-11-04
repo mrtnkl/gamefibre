@@ -24,7 +24,7 @@ class TagFilterBarTest {
         val facets = LibraryTagSearch(listOf(TagSearchGame("a", "Game", listOf("RPG", "Space"))))
             .facets("", TagFilters())
         bar.update(facets, TagFilters())
-        assertEquals(1, bar.childCount)
+        assertEquals(2, bar.childCount)
         val recycler = views(bar).filterIsInstance<RecyclerView>().single()
         @Suppress("UNCHECKED_CAST")
         val adapter = recycler.adapter as RecyclerView.Adapter<RecyclerView.ViewHolder>
@@ -51,9 +51,43 @@ class TagFilterBarTest {
         assertEquals(4, applications)
         assertEquals(View.GONE, bar.visibility)
     }
+    @Test fun clearButtonRemovesIncludedAndExcludedTagsAndClosesTheLibraryBar() {
+        val context = RuntimeEnvironment.getApplication()
+        val ui = NativeUi(context)
+        var filters = TagFilters(included = setOf("RPG"), excluded = setOf("Space"))
+        var applications = 0
+        val search = LibraryTagSearch(listOf(
+            TagSearchGame("a", "Game A", listOf("RPG")),
+            TagSearchGame("b", "Game B", listOf("Space")),
+            TagSearchGame("c", "Game C", emptyList())))
+        val bar = TagFilterBar(context, ui) { filters = it; applications++ }
+        bar.update(search.facets("", filters), filters)
+        val clear = views(bar).single { it.contentDescription == "Clear tag filters" }
+        assertTrue(clear.isFocusable)
+        assertEquals("Clear tag filters", clear.tooltipText)
+        assertEquals("android.widget.Button", clear.createAccessibilityNodeInfo().className)
+
+        bar.measure(View.MeasureSpec.makeMeasureSpec(ui.dp(320), View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(ui.dp(56), View.MeasureSpec.EXACTLY))
+        bar.layout(0, 0, bar.measuredWidth, bar.measuredHeight)
+        val recycler = views(bar).filterIsInstance<RecyclerView>().single()
+        assertEquals(ui.dp(48), clear.width)
+        assertEquals(ui.dp(48), clear.height)
+        assertEquals(bar.width, clear.right)
+        assertEquals(clear.left, recycler.right)
+
+        clear.performClick()
+        assertEquals(TagFilters(), filters)
+        assertEquals(1, applications)
+        assertEquals(setOf("a", "b", "c"), search.keys("", filters))
+        assertEquals(View.GONE, bar.visibility)
+    }
+
     @Test fun discoveryTagsStayVisibleAfterClearingLastSelection() {
         val context = RuntimeEnvironment.getApplication()
         val bar = TagFilterBar(context, alwaysVisible = true)
+        assertEquals(1, bar.childCount)
+        assertTrue(views(bar).none { it.contentDescription == "Clear tag filters" })
         val selection = TagFilters(setOf("RPG"))
         val facets = LibraryTagSearch(listOf(TagSearchGame("a", "Game", listOf("RPG")))).facets("", selection)
         bar.update(facets, selection)

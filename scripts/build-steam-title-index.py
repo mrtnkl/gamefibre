@@ -54,10 +54,10 @@ def encode(records, block_size=BLOCK_SIZE):
     return header + b"".join(struct.pack(">i", offset) for offset in offsets) + data
 
 
-def build(source, output):
+def build(source, output, *, revision=REVISION, expected_sha256=CSV_SHA256, aliases=ASSETS / "hltb-names.tsv"):
     with source.open("rb") as stream:
         digest = hashlib.file_digest(stream, "sha256").hexdigest()
-    if digest != CSV_SHA256:
+    if digest != expected_sha256:
         raise ValueError("CSV differs from the pinned snapshot; update revision and checksum together")
     candidates = {}
     relaxed_candidates = {}
@@ -78,7 +78,6 @@ def build(source, output):
         for row in csv.DictReader(stream):
             source_rows += 1
             add(int(row["AppID"]), row["Name"])
-    aliases = ASSETS / "hltb-names.tsv"
     with aliases.open(encoding="utf-8") as stream:
         for line in stream:
             app_id, title = line.rstrip("\n").split("\t", 1)
@@ -97,7 +96,7 @@ def build(source, output):
     plain = b"".join(struct.pack(">ii", len(name.encode("utf-8")), app_id) + name.encode("utf-8")
                      for name, app_id in records + relaxed_records)
     manifest = {
-        "format_version": 2, "source": SOURCE, "source_revision": REVISION, "source_sha256": digest,
+        "format_version": 2, "source": f"https://huggingface.co/datasets/FronkonGames/steam-games-dataset/resolve/{revision}/games.csv", "source_revision": revision, "source_sha256": digest,
         "source_license": "MIT", "source_rows": source_rows, "source_bytes": source.stat().st_size,
         "aliases_sha256": hashlib.sha256(aliases.read_bytes()).hexdigest(),
         "unique_titles": len(records), "ambiguous_titles_excluded": sum(len(ids) > 1 for ids in candidates.values()),

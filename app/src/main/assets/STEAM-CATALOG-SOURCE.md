@@ -1,5 +1,11 @@
 # Offline Steam discovery catalog
 
+Refresh all bundled datasets together with `python3 scripts/update-bundled-data.py`.
+Release builds run this automatically. Current revisions, checksums, sizes, and
+coverage are in the adjacent JSON manifests and `bundled-data-sources.json`.
+The measurements and pinned commands below describe the initial snapshot; they
+are retained as format documentation, not current coverage guarantees.
+
 Source: FronkonGames / Martin Bustos, Steam Games Dataset (MIT), sharing the existing
 `licenses/fronkongames-steam-dataset-MIT.txt` attribution. Uses the same pinned
 `games.json` revision and SHA-256 as `STEAM-TAGS-SOURCE.md`.

@@ -49,8 +49,10 @@ class BeatIndexTest {
         val csv = File("src/main/assets/hltb-min.csv").readLines()
         val names = File("src/main/assets/hltb-names.tsv").readLines()
         val index = BeatIndex.parse(csv.asSequence(), names.asSequence())
-        assertEquals(97025L, index.find(game(LibraryStore.STEAM, "367520", "Hollow Knight"))?.main)
-        assertEquals(97025L, index.find(game(LibraryStore.GOG, "other-id", "Hollow Knight"))?.main)
+        val expected = csv.first { it.startsWith("367520,") }.split(',')[1].toLong()
+        assertTrue(expected > 0)
+        assertEquals(expected, index.find(game(LibraryStore.STEAM, "367520", "Hollow Knight"))?.main)
+        assertEquals(expected, index.find(game(LibraryStore.GOG, "other-id", "Hollow Knight"))?.main)
     }
     @Test fun binaryIndexMatchesSourceDataForEveryIdAndTitle() {
         val csv = File("src/main/assets/hltb-min.csv").readLines()

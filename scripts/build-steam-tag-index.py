@@ -16,10 +16,10 @@ SOURCE_SHA256 = "6c5c8f7c119c4f3f38cf82944d79ae6f3ca9a433ce39685a9a98393108b50ef
 SOURCE = f"https://huggingface.co/datasets/FronkonGames/steam-games-dataset/resolve/{REVISION}/games.json"
 
 
-def build(source, output):
+def build(source, output, *, revision=REVISION, expected_sha256=SOURCE_SHA256):
     with source.open("rb") as stream:
         digest = hashlib.file_digest(stream, "sha256").hexdigest()
-    if digest != SOURCE_SHA256:
+    if digest != expected_sha256:
         raise ValueError("JSON differs from pinned snapshot; update revision and checksum together")
     rows = []
     count = 0
@@ -42,7 +42,7 @@ def build(source, output):
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_bytes(packed)
     manifest = {
-        "format_version": 1, "source": SOURCE, "source_revision": REVISION,
+        "format_version": 1, "source": f"https://huggingface.co/datasets/FronkonGames/steam-games-dataset/resolve/{revision}/games.json", "source_revision": revision,
         "source_sha256": digest, "source_license": "MIT", "source_games": count,
         "tagged_games": len(rows), "unique_tags": len(names),
         "tag_assignments": sum(frequency.values()), "block_size": 32,

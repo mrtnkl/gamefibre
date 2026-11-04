@@ -25,14 +25,16 @@ class StoreSearchStartupTest {
             val strip = view.tagBar.getChildAt(0) as RecyclerView
             @Suppress("UNCHECKED_CAST")
             val adapter = strip.adapter as RecyclerView.Adapter<RecyclerView.ViewHolder>
-            assertEquals(452, adapter.itemCount)
+            val labels = context.resources.getStringArray(R.array.steam_catalog_tag_names)
+            assertTrue(labels.isNotEmpty())
+            assertEquals(labels.size, adapter.itemCount)
             val holder = adapter.createViewHolder(strip, 0)
             adapter.bindViewHolder(holder, 0)
             val pill = (holder.itemView as ViewGroup).getChildAt(0) as CheckBox
-            assertEquals("Singleplayer", pill.text.toString())
+            assertEquals(labels.first(), pill.text.toString())
             pill.performClick()
-            assertEquals(listOf("Singleplayer"), view.snapshot().getStringArrayList("tags"))
-            assertEquals(452, adapter.itemCount)
+            assertEquals(listOf(labels.first()), view.snapshot().getStringArrayList("tags"))
+            assertEquals(labels.size, adapter.itemCount)
             assertEquals(0, view.pendingCount)
         } finally { view.close(); scope.cancel() }
     }

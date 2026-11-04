@@ -197,10 +197,7 @@ nav {
 h1 {
   font-size: clamp(44px, 6vw, 72px);
   line-height: 1.08;
-  letter-spacing: -0.055em;
-}
-h1 span {
-  color: var(--blue);
+  letter-spacing: normal;
 }
 .hero-description {
   font-size: 19px;
@@ -272,10 +269,12 @@ h1 span {
   flex: none;
   width: 42px;
   height: 42px;
-  border-radius: 14px;
   color: var(--blue);
-  background: #e0eafa;
-  font-size: 23px;
+}
+.feature-symbol svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2;
 }
 .feature-list p {
   font-size: 14px;
@@ -324,7 +323,7 @@ figcaption {
   background: #fff;
 }
 .portrait-preview .screenshot-track {
-  aspect-ratio: 864 / 1920;
+  aspect-ratio: 640 / 1422;
 }
 .screenshot-carousel figcaption {
   display: flex;
@@ -356,82 +355,48 @@ figcaption {
 .carousel-controls button:hover {
   background: var(--pale-blue);
 }
-.discovery-section {
-  padding-block: 100px;
+.included-section {
+  margin-block: 56px;
 }
-.section-heading {
-  max-width: 690px;
-  text-align: center;
-  margin: 0 auto 40px;
+.included-panel {
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 32px;
 }
-.section-heading > p:last-child {
+.included-panel h2 {
   color: var(--secondary);
-  margin: 22px 0 0;
+  font-size: 18px;
+  letter-spacing: normal;
+  line-height: 1.4;
+  margin-bottom: 26px;
 }
-.details-grid {
+.included-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 44px;
-  margin-top: 64px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 26px 40px;
 }
-.detail-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--pale-blue);
+.included-grid article {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.included-grid svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
   color: var(--blue);
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  margin-bottom: 18px;
 }
-.detail-icon svg {
-  width: 23px;
-  height: 23px;
-}
-.details-grid p {
-  font-size: 14px;
-  color: var(--secondary);
-  margin: 12px 0 0;
-}
-.export-section {
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  align-items: center;
-  gap: 64px;
-  background: var(--surface);
-  padding: 48px 64px;
-  border-radius: 28px;
-}
-.export-art {
-  display: grid;
-  place-items: center;
-}
-.export-art svg {
-  width: 160px;
-  height: 160px;
-  stroke: var(--blue);
-  stroke-width: 3;
-}
-.export-section h2 {
-  font-size: 36px;
-}
-.export-section p:not(.eyebrow) {
-  color: var(--secondary);
-  margin-top: 20px;
-}
-.export-section .supporting {
-  margin-bottom: 0;
-}
-.privacy-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 100px;
-  padding-block: 100px;
-}
-.privacy-section p:not(.eyebrow) {
-  color: var(--secondary);
+.included-grid h3 {
   font-size: 15px;
+  font-weight: 500;
+  letter-spacing: normal;
+}
+.included-grid p {
+  color: var(--secondary);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 5px 0 0;
 }
 .text-link {
   display: inline-flex;
@@ -526,20 +491,6 @@ footer > a:last-child {
   .collection-layout {
     gap: 40px;
   }
-  .details-grid {
-    gap: 26px;
-  }
-  .privacy-section {
-    gap: 40px;
-  }
-  .export-section {
-    grid-template-columns: 140px 1fr;
-    gap: 32px;
-    padding: 40px;
-  }
-  .export-art svg {
-    width: 140px;
-  }
   .portrait-preview {
     width: 255px;
   }
@@ -611,52 +562,15 @@ footer > a:last-child {
   .portrait-preview {
     width: 250px;
   }
-  .discovery-section {
-    padding-block: 64px;
+  .included-section {
+    margin-block: 36px;
   }
-  .section-heading {
-    text-align: left;
-    margin-bottom: 28px;
+  .included-panel {
+    padding: 24px 20px;
   }
-  .section-heading > p:last-child {
-    font-size: 15px;
-  }
-  .details-grid {
-    grid-template-columns: 1fr;
-    gap: 30px;
-    margin-top: 38px;
-  }
-  .detail-icon {
-    margin-bottom: 12px;
-  }
-  .details-grid p {
-    max-width: 440px;
-  }
-  .export-section {
-    grid-template-columns: 1fr;
-    padding: 30px 24px;
-    gap: 16px;
-  }
-  .export-art {
-    justify-items: start;
-  }
-  .export-art svg {
-    width: 80px;
-    height: 80px;
-  }
-  .export-section h2 {
-    font-size: 30px;
-  }
-  .export-section p:not(.eyebrow) {
-    font-size: 14px;
-  }
-  .privacy-section {
+  .included-grid {
     grid-template-columns: 1fr;
     gap: 22px;
-    padding-block: 64px;
-  }
-  .privacy-section .eyebrow {
-    margin-bottom: 12px;
   }
   .download-panel {
     padding: 36px 20px;

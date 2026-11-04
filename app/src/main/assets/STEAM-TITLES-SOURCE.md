@@ -1,5 +1,11 @@
 # Offline Steam title catalog
 
+Refresh all bundled datasets together with `python3 scripts/update-bundled-data.py`.
+Release builds run this automatically. Current revisions, checksums, sizes, and
+coverage are in the adjacent JSON manifests and `bundled-data-sources.json`.
+The measurements and pinned commands below describe the initial snapshot; they
+are retained as format documentation, not current coverage guarantees.
+
 Source: FronkonGames / Martin Bustos, **Steam Games Dataset** (MIT).
 
 - Dataset: https://huggingface.co/datasets/FronkonGames/steam-games-dataset

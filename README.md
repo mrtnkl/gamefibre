@@ -28,3 +28,48 @@ the downloaded APK to install it over the existing app and keep your saved data.
 **Privacy and security:** GameFibre doesn’t save your passwords or sign-in codes. To keep accounts connected, it saves refresh tokens—store-issued passes that renew your sign-in—and account IDs, encrypted using Android Keystore. Access tokens stay in memory. Your collection and preferences are stored locally on your device; signing out removes that store’s saved session. If you use SteamGridDB, your API key is also stored encrypted on your device.
 
 [Visit gamefibre.com](https://gamefibre.com)
+
+
+## Updating bundled game data
+
+Run from the repository root with Python 3.11 or newer:
+
+```sh
+python3 scripts/update-bundled-data.py
+```
+
+This downloads the latest published Steam dataset and HLTB snapshot, then rebuilds
+Steam title/ID matching, community tags, Metascores, review counts, release dates,
+completion times, and the compiled tag labels. It uses Python's standard library;
+no npm setup or API keys are needed. Downloads total about 1.4 GB and stay outside
+the repository and APK. To reuse verified downloads between runs:
+
+```sh
+python3 scripts/update-bundled-data.py --cache-dir /path/to/gamefibre-data-cache
+```
+
+The updater resolves immutable source versions and verifies upstream SHA-256 hashes.
+It prepares every output before replacing bundled files. A download or build failure
+leaves the existing data in place and exits with an error. Commit refreshed assets
+if you want local debug builds to include them.
+
+The signed release workflow runs the updater before testing and building, both for
+`v*` tags and manual runs. An update failure stops the release. Generated data is
+included in the APK without making an automatic commit or changing the tag. Each
+release also includes `bundled-data-sources.json`, recording source versions,
+checksums, coverage, and output hashes. The same manifest is bundled in the APK.
+
+“Latest” means the newest snapshot published by each source, rather than live
+Steam or HowLongToBeat data. Steam CSV and JSON exports can have different coverage,
+even at the same revision. The HLTB snapshot publisher
+([hltb-scraper](https://github.com/julianxhokaxhiu/hltb-scraper)) was archived in June
+2026; its last published snapshot is from June 28, 2026. This command cannot make
+that upstream data newer. Replace the HLTB source in the updater when a maintained
+snapshot publisher is available.
+
+Validate builder changes with:
+
+```sh
+python3 -m unittest discover -s scripts -p 'test_*.py'
+./gradlew :app:testDebugUnitTest --tests '*SteamTitleIndexTest' --tests '*SteamTagIndexTest' --tests '*SteamCatalogTest' --tests '*BeatIndexTest' --tests '*StoreSearchStartupTest'
+```

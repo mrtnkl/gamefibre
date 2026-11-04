@@ -31,7 +31,7 @@ jobs:
           log-accepted-android-sdk-licenses: false
       - name: Install Android SDK
         run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
-      - name: Check title-normalization parity of the index builders
+      - name: Check bundled data builders
         run: python3 -m unittest discover -s scripts -p 'test_*.py'
       - name: Test, lint, and build
         run: ./gradlew --no-daemon :app:testDebugUnitTest :app:lintDebug :app:assembleDebug

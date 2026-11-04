@@ -40,7 +40,8 @@ keystore.properties
 !.env.example
 !.env.*.example
 
-# The optional npm command runner has no dependencies
+# Personal npm command runner and dependencies
+/package.json
 node_modules/
 
 # Python tooling caches

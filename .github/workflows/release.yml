@@ -15,7 +15,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -52,6 +52,13 @@ jobs:
       - name: Install Android SDK
         run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
 
+      - name: Refresh bundled game databases
+        timeout-minutes: 25
+        run: python3 -u scripts/update-bundled-data.py
+
+      - name: Check data builders
+        run: python3 -m unittest discover -s scripts -p 'test_*.py'
+
       - name: Restore signing key
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -80,6 +87,7 @@ jobs:
           mkdir -p dist
           cp "$apk" "dist/gamefibre-$version.apk"
           cp .github/android-signing.sha256 dist/signing-certificate.sha256
+          cp app/src/main/assets/bundled-data-sources.json dist/bundled-data-sources.json
           cd dist
           sha256sum ./*.apk > SHA256SUMS.txt
 

@@ -1,7 +1,10 @@
 package com.gamefibre
 
 import android.content.Context
+import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
+import android.view.accessibility.AccessibilityNodeInfo
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import kotlin.math.abs
@@ -73,9 +76,25 @@ internal class TagFilterBar @JvmOverloads constructor(context: Context, private 
     }
 
     init {
-        orientation = VERTICAL
+        orientation = HORIZONTAL
+        gravity = Gravity.CENTER_VERTICAL
         chips.adapter = pills
-        ui.add(this, chips, 56)
+        addView(chips, LayoutParams(0, ui.dp(56), 1f))
+        if (!alwaysVisible) {
+            addView(ui.iconButton(R.drawable.ic_x, "Clear tag filters") {
+                filters = TagFilters()
+                visibility = GONE
+                change(filters)
+            }.apply {
+                tooltipText = "Clear tag filters"
+                accessibilityDelegate = object : View.AccessibilityDelegate() {
+                    override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfo) {
+                        super.onInitializeAccessibilityNodeInfo(host, info)
+                        info.className = "android.widget.Button"
+                    }
+                }
+            }, LayoutParams(ui.dp(48), ui.dp(48)))
+        }
     }
 
     fun update(value: List<TagFacet>, selection: TagFilters) {

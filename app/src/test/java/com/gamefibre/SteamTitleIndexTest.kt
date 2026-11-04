@@ -15,6 +15,8 @@ import java.security.MessageDigest
 class SteamTitleIndexTest {
     private val asset = File("src/main/assets/steam-titles-v2.bin.xz")
     private fun bundled() = asset.inputStream().use(SteamTitleIndex::read)
+    private fun hollowKnightMain() = File("src/main/assets/hltb-min.csv").readLines()
+        .first { it.startsWith("367520,") }.split(',')[1].toLong()
 
     private fun fixture(entries: List<Pair<String, Int>>, blockSize: Int = 2): ByteArray {
         val data = ByteArrayOutputStream()
@@ -98,7 +100,7 @@ class SteamTitleIndexTest {
         assertEquals("367520", beat.steamId(gog, listOf(known)))
         beat.updateKnownSteamGames(listOf(known))
         assertEquals("367520", beat.steamId(epic))
-        assertEquals(97025L, beat.find(gog)?.main)
+        assertEquals(hollowKnightMain(), beat.find(gog)?.main)
         assertEquals("10", beat.steamId(LibraryEntry(LibraryStore.STEAM, "10", "Known Game")))
         beat.updateKnownSteamGames(listOf(known, LibraryEntry(LibraryStore.STEAM, "20", "Known Game")))
         assertNull(beat.steamId(gog))
@@ -201,7 +203,7 @@ class SteamTitleIndexTest {
             else assertTrue("Existing alias must either retain its ID or be excluded as ambiguous: $title", found == null || found in ids)
         }
         val combined = File("src/main/assets/hltb-index-v1.bin").inputStream().use { BeatIndex.read(it, index) }
-        assertEquals(97025L, combined.find(LibraryEntry(LibraryStore.GOG, "gog-id", "Hollow Knight"))?.main)
+        assertEquals(hollowKnightMain(), combined.find(LibraryEntry(LibraryStore.GOG, "gog-id", "Hollow Knight"))?.main)
         assertEquals("1022310", combined.steamId(LibraryEntry(LibraryStore.EPIC, "epic-id", "Warhammer Underworlds - Shadespire Edition")))
         // A match absent from the broader catalog must not silently use the old, potentially ambiguous match.
         val empty = SteamTitleIndex.read(fixture(emptyList()).inputStream())
