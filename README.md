@@ -38,34 +38,36 @@ Run from the repository root with Python 3.11 or newer:
 python3 scripts/update-bundled-data.py
 ```
 
-This downloads the latest published Steam dataset and HLTB snapshot, then rebuilds
+This downloads the latest published Steam dataset, then rebuilds
 Steam title/ID matching, community tags, Metascores, review counts, release dates,
-completion times, and the compiled tag labels. It uses Python's standard library;
-no npm setup or API keys are needed. Downloads total about 1.4 GB and stay outside
-the repository and APK. To reuse verified downloads between runs:
+and the compiled tag labels. Completion estimates and title aliases use the fixed
+HLTB dataset checked into the repository; its index is rebuilt locally without
+HLTB network requests. The updater uses Python's standard library; no npm setup
+or API keys are needed. Steam downloads total about 1.4 GB and stay outside the
+APK. To reuse verified Steam downloads between runs:
 
 ```sh
 python3 scripts/update-bundled-data.py --cache-dir /path/to/gamefibre-data-cache
 ```
 
-The updater resolves immutable source versions and verifies upstream SHA-256 hashes.
+The updater pins the latest Steam revision and verifies upstream SHA-256 hashes.
+It verifies the fixed HLTB inputs against their recorded SHA-256 hashes.
 It prepares every output before replacing bundled files. A download or build failure
-leaves the existing data in place and exits with an error. Commit refreshed assets
-if you want local debug builds to include them.
+leaves the existing data in place and exits with an error.
+
+Generated indexes, manifests, and tag resources are ignored by Git. The fixed
+HLTB source CSV and title aliases remain tracked. Run the
+updater after a fresh checkout, and again whenever you want current local data.
+Android builds verify the generated files against their manifest and report the
+update command if data is missing or inconsistent. Normal local builds reuse the
+last successful generation. The Android check workflow generates its own data.
 
 The signed release workflow runs the updater before testing and building, both for
 `v*` tags and manual runs. An update failure stops the release. Generated data is
 included in the APK without making an automatic commit or changing the tag. Each
-release also includes `bundled-data-sources.json`, recording source versions,
-checksums, coverage, and output hashes. The same manifest is bundled in the APK.
-
-“Latest” means the newest snapshot published by each source, rather than live
-Steam or HowLongToBeat data. Steam CSV and JSON exports can have different coverage,
-even at the same revision. The HLTB snapshot publisher
-([hltb-scraper](https://github.com/julianxhokaxhiu/hltb-scraper)) was archived in June
-2026; its last published snapshot is from June 28, 2026. This command cannot make
-that upstream data newer. Replace the HLTB source in the updater when a maintained
-snapshot publisher is available.
+release also includes `bundled-data-sources.json`, recording the Steam revision,
+fixed HLTB snapshot, checksums, coverage, and output hashes. The same
+manifest is bundled in the APK.
 
 Validate builder changes with:
 

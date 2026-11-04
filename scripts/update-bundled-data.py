@@ -1,10 +1,9 @@
-"""Fetch the latest published Steam/HLTB snapshots and rebuild all bundled indexes.
+"""Fetch the latest Steam dataset; rebuild indexes with the fixed local HLTB data.
 
 Python 3.11+; no third-party dependencies. Downloads and builds finish in staging
 before repository assets are replaced. A source/build failure exits unsuccessfully.
 """
 import argparse
-import csv
 import hashlib
 import importlib.util
 import json
@@ -20,8 +19,17 @@ import urllib.request
 ROOT = Path(__file__).resolve().parents[1]
 STEAM_API = "https://huggingface.co/api/datasets/FronkonGames/steam-games-dataset"
 STEAM_FILES = "https://huggingface.co/datasets/FronkonGames/steam-games-dataset/resolve"
-HLTB_REPO = "julianxhokaxhiu/hltb-scraper"
-TIME_FIELDS = ("comp_main", "comp_plus", "comp_100")
+FIXED_HLTB = {
+    "mode": "fixed",
+    "release": "scrape-2026-06-28",
+    "published_at": "2026-06-28T10:08:49Z",
+    "url": "https://github.com/julianxhokaxhiu/hltb-scraper/releases/download/scrape-2026-06-28/howlongtobeat_games.csv",
+    "files": {
+        "hltb-min.csv": "3317090732f7b0f4f6ad322552f12b4a1406ae32218fc90cd665e544c8924c8f",
+        "hltb-names.tsv": "48eaf8a4beebfea5837304f2f56e9c8ff6d2eac1518daa3e2415d6685bb0805f",
+    },
+    "coverage": {"time_records": 31520, "title_aliases": 48514},
+}
 
 
 def checksum(path):
@@ -68,16 +76,7 @@ def resolve_sources():
         item = files[name]
         steam[name] = dict(url=f"{STEAM_FILES}/{revision}/{name}",
                            sha256=sha256_value(item["lfs"]["oid"]), size=item["size"])
-    release = get_json(f"https://api.github.com/repos/{HLTB_REPO}/releases/latest")
-    if release["draft"] or release["prerelease"]:
-        raise ValueError("Expected a stable published HLTB snapshot")
-    asset = next(a for a in release["assets"] if a["name"] == "howlongtobeat_games.csv")
-    if not asset["browser_download_url"].startswith(f"https://github.com/{HLTB_REPO}/releases/download/"):
-        raise ValueError("Unexpected HLTB asset URL")
-    return dict(steam=dict(revision=revision, files=steam),
-                hltb=dict(release=release["tag_name"], published_at=release["published_at"],
-                          url=asset["browser_download_url"], sha256=sha256_value(asset.get("digest") or ""),
-                          size=asset["size"]))
+    return dict(steam=dict(revision=revision, files=steam))
 
 
 def download(source, cache):
@@ -106,51 +105,29 @@ def builder(name):
     return module
 
 
-def prepare_hltb(source, assets):
-    times, names = {}, set()
-    with source.open(encoding="utf-8-sig", newline="") as stream:
-        reader = csv.DictReader(stream)
-        if not {"steam_id", "game_name", *TIME_FIELDS} <= set(reader.fieldnames or []):
-            raise ValueError("HLTB CSV schema changed")
-        for row in reader:
-            app_id = int(row["steam_id"] or 0)
-            if app_id <= 0:
-                continue
-            if app_id > 0x7fffffff:
-                raise ValueError("HLTB Steam ID exceeds the index format")
-            values = tuple(int(row[key] or 0) for key in TIME_FIELDS)
-            if any(value < 0 or value > 0x7fffffffffffffff for value in values):
-                raise ValueError(f"Invalid completion times for {app_id}")
-            if any(values):
-                times.setdefault(app_id, values)
-            name = " ".join(row["game_name"].split())
-            if name:
-                names.add((app_id, name))
-    if not times or not names:
-        raise ValueError("HLTB snapshot contains no usable times or titles")
-    with (assets / "hltb-min.csv").open("w", encoding="utf-8", newline="") as output:
-        writer = csv.writer(output, lineterminator="\n")
-        writer.writerow(("steam_id", *TIME_FIELDS))
-        writer.writerows((app_id, *values) for app_id, values in sorted(times.items()))
-    (assets / "hltb-names.tsv").write_text(
-        "".join(f"{app_id}\t{name}\n" for app_id, name in sorted(names)), encoding="utf-8")
-    return dict(time_records=len(times), title_aliases=len(names))
+def prepare_fixed_hltb(root, assets):
+    for name, digest in FIXED_HLTB["files"].items():
+        source = root / "app/src/main/assets" / name
+        if not source.is_file() or checksum(source) != digest:
+            raise ValueError(f"Fixed HLTB dataset is missing or modified: {name}. Restore it from Git.")
+        shutil.copyfile(source, assets / name)
+    return dict(FIXED_HLTB)
 
 
 def update(root, cache):
-    sources = resolve_sources()
     cache.mkdir(parents=True, exist_ok=True)
-    # Resolve one immutable Steam revision and one HLTB release before downloading.
-    csv_source = download(sources["steam"]["files"]["games.csv"], cache)
-    json_source = download(sources["steam"]["files"]["games.json"], cache)
-    hltb_source = download(sources["hltb"], cache)
     with tempfile.TemporaryDirectory(prefix="gamefibre-data-build-") as directory:
         stage = Path(directory)
         assets = stage / "app/src/main/assets"
         assets.mkdir(parents=True)
+        # Validate the checked-in inputs before making any network requests.
+        hltb = prepare_fixed_hltb(root, assets)
+        sources = resolve_sources()
+        sources["hltb"] = hltb
+        csv_source = download(sources["steam"]["files"]["games.csv"], cache)
+        json_source = download(sources["steam"]["files"]["games.json"], cache)
         resource = stage / "app/src/main/res/values/steam_catalog_tags.xml"
         resource.parent.mkdir(parents=True)
-        sources["hltb"]["coverage"] = prepare_hltb(hltb_source, assets)
         builder("build-hltb-index").build(assets)
         revision = sources["steam"]["revision"]
         builder("build-steam-title-index").build(
@@ -166,7 +143,7 @@ def update(root, cache):
                             ("steam-tags-v1.json", "tagged_games"), ("steam-catalog-v1.json", "games")):
             if json.loads((assets / name).read_text())[field] <= 0:
                 raise ValueError(f"No usable records in {name}")
-        outputs = sorted(path for path in stage.rglob("*") if path.is_file())
+        outputs = sorted(path for path in (stage / "app").rglob("*") if path.is_file())
         sources["outputs"] = {str(path.relative_to(stage)): checksum(path) for path in outputs}
         manifest = assets / "bundled-data-sources.json"
         manifest.write_text(json.dumps(sources, indent=2) + "\n", encoding="utf-8")
@@ -183,7 +160,7 @@ def update(root, cache):
             finally:
                 if os.path.exists(temporary):
                     os.unlink(temporary)
-    print(f"Updated all bundled data: Steam {revision}, HLTB {sources['hltb']['release']}", flush=True)
+    print(f"Updated bundled indexes: Steam {revision}, fixed HLTB {sources['hltb']['release']}", flush=True)
 
 
 def main():

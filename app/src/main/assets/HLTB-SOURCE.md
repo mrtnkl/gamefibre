@@ -1,15 +1,15 @@
 # Offline completion-time data
 
-Refresh all datasets with `python3 scripts/update-bundled-data.py`.
-The updater downloads `howlongtobeat_games.csv` from the latest stable release of
-https://github.com/julianxhokaxhiu/hltb-scraper and generates `hltb-min.csv` and
-`hltb-names.tsv` from its Steam IDs, game names, and completion-time columns.
-The upstream MIT license is in `licenses/hltb-scraper-MIT.txt`.
-`bundled-data-sources.json` records the exact release, publication date, source
-checksum, coverage, and generated file hashes.
-
-The publisher was archived in June 2026; its final snapshot is June 28, 2026.
-Refreshing fetches the newest published snapshot, not live HowLongToBeat data.
+Rebuild indexes with `python3 scripts/update-bundled-data.py`.
+Completion estimates use the fixed `hltb-min.csv` and `hltb-names.tsv` checked into
+Git, derived from the `scrape-2026-06-28` snapshot of
+https://github.com/julianxhokaxhiu/hltb-scraper. There are 31,520 time records and
+48,514 title aliases. The upstream MIT license is in `licenses/hltb-scraper-MIT.txt`.
+The updater verifies these inputs against their recorded SHA-256 hashes and
+rebuilds the binary index locally. It makes no HLTB requests or snapshot downloads.
+Steam metadata is refreshed independently and merges these fixed title aliases.
+`bundled-data-sources.json` records the fixed snapshot, source checksums,
+coverage, and generated file hashes.
 
 The completion values are seconds. Estimates are a static snapshot and are not
 refreshed over the network. The first nonzero row for a Steam ID is retained.

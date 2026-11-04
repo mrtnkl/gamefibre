@@ -47,5 +47,17 @@ node_modules/
 # Python tooling caches
 __pycache__/
 
+# Generated game data; rebuild with scripts/update-bundled-data.py
+/.cache/bundled-data/
+/app/src/main/assets/bundled-data-sources.json
+/app/src/main/assets/hltb-index-v1.bin
+/app/src/main/assets/steam-titles-v2.bin.xz
+/app/src/main/assets/steam-titles-v2.json
+/app/src/main/assets/steam-tags-v1.bin.xz
+/app/src/main/assets/steam-tags-v1.json
+/app/src/main/assets/steam-catalog-v1.bin.xz
+/app/src/main/assets/steam-catalog-v1.json
+/app/src/main/res/values/steam_catalog_tags.xml
+
 # Local release signing backup; never commit private keys or passwords
 .signing/

@@ -5,6 +5,43 @@ plugins {
 
 apply from: 'steam-memory.gradle'
 
+// Indexes are generated locally or by CI; fixed HLTB source files stay in Git.
+def bundledDataFiles = [
+    'src/main/assets/hltb-index-v1.bin', 'src/main/assets/hltb-min.csv',
+    'src/main/assets/hltb-names.tsv', 'src/main/assets/steam-titles-v2.bin.xz',
+    'src/main/assets/steam-titles-v2.json', 'src/main/assets/steam-tags-v1.bin.xz',
+    'src/main/assets/steam-tags-v1.json', 'src/main/assets/steam-catalog-v1.bin.xz',
+    'src/main/assets/steam-catalog-v1.json', 'src/main/res/values/steam_catalog_tags.xml'
+]
+def verifyBundledData = tasks.register('verifyBundledData') {
+    group = 'verification'
+    description = 'Verify generated game data before compiling or packaging the app.'
+    doLast {
+        def manifestFile = file('src/main/assets/bundled-data-sources.json')
+        def updateCommand = 'Run python3 scripts/update-bundled-data.py from the repository root.'
+        if (!manifestFile.isFile() || bundledDataFiles.any { !file(it).isFile() }) {
+            throw new GradleException('Generated game data is missing. ' + updateCommand)
+        }
+        try {
+            def manifest = new groovy.json.JsonSlurper().parse(manifestFile)
+            bundledDataFiles.each { path ->
+                def digest = java.security.MessageDigest.getInstance('SHA-256')
+                file(path).withInputStream { stream ->
+                    byte[] buffer = new byte[65536]
+                    int length
+                    while ((length = stream.read(buffer)) != -1) digest.update(buffer, 0, length)
+                }
+                if (digest.digest().encodeHex().toString() != manifest.outputs['app/' + path]) {
+                    throw new GradleException('Generated game data is inconsistent: ' + path)
+                }
+            }
+        } catch (Exception error) {
+            throw new GradleException('Cannot verify generated game data: ' + error.message + '. ' + updateCommand, error)
+        }
+    }
+}
+tasks.named('preBuild').configure { dependsOn verifyBundledData }
+
 def appVersion = new Properties()
 rootProject.file('version.properties').withInputStream { appVersion.load(it) }
 
