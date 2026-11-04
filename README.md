@@ -27,6 +27,14 @@ the downloaded APK to install it over the existing app and keep your saved data.
 
 **Privacy and security:** GameFibre doesn’t save your passwords or sign-in codes. To keep accounts connected, it saves refresh tokens—store-issued passes that renew your sign-in—and account IDs, encrypted using Android Keystore. Access tokens stay in memory. Your collection and preferences are stored locally on your device; signing out removes that store’s saved session. If you use SteamGridDB, your API key is also stored encrypted on your device.
 
+The app uses the Google Analytics web tag (`G-700CE8XQ5S`) in an invisible WebView
+to record a page view and `app_open` when the main activity is created. Returning
+to the same activity does not send another opening. These appear as web traffic
+at `https://gamefibre.com/app/`, using cookies to recognize repeat visits. No
+account IDs, game lists, searches, or sign-in details are passed to the tag.
+Google signals and ad personalization signals are disabled. This uses no Firebase
+SDK; the website keeps its separate Analytics ID.
+
 [Visit gamefibre.com](https://gamefibre.com)
 
 

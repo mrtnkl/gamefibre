@@ -47,6 +47,7 @@ import org.json.JSONObject
 import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
+    private val analytics by lazy { AppAnalytics(this) }
     private val collectionTransfer by lazy { androidx.lifecycle.ViewModelProvider(this)[CollectionTransferModel::class.java] }
     private var transferDialog: Dialog? = null
     private val exportCollection = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/zip")) { uri ->
@@ -384,6 +385,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart(); networkRequested = true; observing = true; engine.observe(observer); render(engine.snapshot())
+        root.post { if (!isFinishing && !isDestroyed) analytics.start() }
         assetObservation=scope.launch { assetRepository.library.collect { if (observing) render(engine.snapshot()) } }
         steamUpdates.value = engine.snapshot()
         steamSubscription = scope.launch { steamUpdates.collect { value -> if (value != null) renderSteamUpdate(value) } }
@@ -447,6 +449,7 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onStop() { steamSubscription?.cancel(); steamSubscription = null; tagObservation?.cancel(); tagObservation = null; assetObservation?.cancel(); assetObservation=null; networkRequested = false; observing = false; engine.removeObserver(observer); storeSubscription?.cancel(); storeSubscription=null; accountSubscription?.cancel(); accountSubscription=null; super.onStop() }
     override fun onDestroy() {
+        analytics.close()
         appUpdatePrompt.close()
         storeSearchView?.close()
         pageVideos?.dispose(); pageVideos = null
