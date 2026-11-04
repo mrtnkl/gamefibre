@@ -1,42 +1,119 @@
-# GameFibre
+<p align="center">
+  <a href="https://gamefibre.com">
+    <img src="https://gamefibre.com/assets/logo.svg" width="96" height="96" alt="GameFibre logo" />
+  </a>
+</p>
 
-**Your game collection, together on Android.**
+<h1 align="center">GameFibre</h1>
 
-GameFibre brings your **Steam, GOG, Epic Games, and Xbox** libraries into one place. It’s designed to make exploring the games you already own feel pleasant: browse covers, rediscover forgotten favorites, and find something you want to play next.
+<p align="center"><strong>Unified game library for Android</strong></p>
 
-Connect your accounts and let your collection load, then take it offline. Your library and cover artwork are stored on your device, so you can keep browsing your collection, custom lists, wishlist, and game progress without an internet connection.
+GameFibre brings your Steam, GOG, Epic and Xbox games into one Android app. Browse
+covers, revisit games you haven't played in a while, and enjoy the collection you
+already own. The focus is on browsing and discovery, with lists and progress
+tracking there when you want them.
 
-- **Make it your collection.** Create custom lists and swipe between them, whether you’re sorting cozy games, weekend adventures, or a backlog you’ll definitely finish someday.
-- **Track your progress.** Mark games as Unplayed, Play next, Playing, On hold, or Finished.
-- **Keep a wishlist.** Save games you’d like to get and import your Steam wishlist.
-- **Choose your covers.** Pick your preferred custom cover art from SteamGridDB using your own API key. Selected covers are saved for offline browsing too.
-- **Explore each game.** Browse screenshots and watch YouTube videos to get a feel for what you might play next.
-- **Find the right fit.** Check HowLongToBeat completion-time estimates and Metascores where available, then sort by time to beat or score to find a quick adventure or a highly rated game.
-- **Find something new.** Browse Xbox Game Pass titles or search the Steam catalog using community tags to find the kinds of games you enjoy.
-- **Bring your game files to Android.** Download games you own on Steam, GOG, or Epic Games and export them as a ZIP file or game folder to your device’s **Downloads** folder.
+<p align="center">
+  <a href="https://github.com/mrtnkl/gamefibre/releases/latest"><strong>Download the latest APK</strong></a>
+  &nbsp;·&nbsp;
+  <a href="https://gamefibre.com">Visit gamefibre.com</a>
+</p>
 
-Exported files can be used with compatible Android game engines and ports, such as **OpenMW for Morrowind**. You’ll need to own the game and follow your chosen engine’s setup instructions; compatibility depends on the game and engine.
+<p align="center">
+  <a href="https://gamefibre.com/assets/screenshot-01.jpg"><img src="https://gamefibre.com/assets/screenshot-01.jpg" width="30%" alt="GameFibre library with Steam, GOG, Epic and Xbox filters" /></a>
+  &nbsp;
+  <a href="https://gamefibre.com/assets/screenshot-02.jpg"><img src="https://gamefibre.com/assets/screenshot-02.jpg" width="30%" alt="Steam games displayed as covers" /></a>
+  &nbsp;
+  <a href="https://gamefibre.com/assets/screenshot-03.jpg"><img src="https://gamefibre.com/assets/screenshot-03.jpg" width="30%" alt="GameFibre list view with game titles and Metascores" /></a>
+</p>
 
-You’ll need an internet connection to connect accounts, update your collection, download games, watch videos, or load media that hasn’t been saved yet. Xbox games can be collected and browsed; file exports are available for Steam, GOG, and Epic Games.
+[Features](#features) · [Privacy and security](#privacy-and-security) · [Build from source](#build-from-source)
 
-GameFibre runs on **Android 10 or newer**.
+## Install and get started
 
-The production app checks GitHub for updates once a day while in use. You can
-dismiss the update prompt and download it later from the hamburger menu. Open
-the downloaded APK to install it over the existing app and keep your saved data.
+GameFibre runs on **Android 10 or newer**. Download the APK from the latest release
+and open it on your device to install. Android may ask you to allow installation
+from your browser or file manager.
 
-**Privacy and security:** GameFibre doesn’t save your passwords or sign-in codes. To keep accounts connected, it saves refresh tokens—store-issued passes that renew your sign-in—and account IDs, encrypted using Android Keystore. Access tokens stay in memory. Your collection and preferences are stored locally on your device; signing out removes that store’s saved session. If you use SteamGridDB, your API key is also stored encrypted on your device.
+Connect your store accounts and let your library and artwork load. Once saved,
+your collection, covers and game details remain available offline, including when
+a store connection expires.
 
-The app uses the Google Analytics web tag (`G-700CE8XQ5S`) in an invisible WebView
-to record a page view and `app_open` when the main activity is created. Returning
-to the same activity does not send another opening. These appear as web traffic
-at `https://gamefibre.com/app/`, using cookies to recognize repeat visits. No
-account IDs, game lists, searches, or sign-in details are passed to the tag.
-Google signals and ad personalization signals are disabled. This uses no Firebase
-SDK; the website keeps its separate Analytics ID.
+GameFibre doesn't save your passwords or sign-in codes. It securely stores the
+token returned by each store on your device and uses it to keep your account
+connected and retrieve your games.
 
-[Visit gamefibre.com](https://gamefibre.com)
+The production app checks for updates once a day while in use. You can dismiss
+the prompt and download the update later from the app menu. Install the new APK
+over the existing app to keep your saved data.
 
+## Features
+
+- **Offline browsing.** Keep browsing your saved collection, covers, game details
+  and lists without an internet connection.
+- **Custom artwork.** Choose alternative covers from SteamGridDB using your own
+  API key. Selected covers are saved on your device too.
+- **Favorites, lists and progress.** Mark favorites, create custom lists and swipe
+  between them. Track games as Unplayed, Play next, Playing, On hold or Finished.
+- **Sorting and discovery.** Sort your collection by Metascore, playtime or
+  HowLongToBeat estimates, or shuffle it to see a different selection.
+- **Game file downloads.** Download games you own on Steam, GOG or Epic to Android
+  as ZIP files or folders. Use the files with compatible ports and engines such
+  as OpenMW for Morrowind or DevilutionX for Diablo, following the engine's setup
+  instructions. Compatibility depends on the game and engine.
+
+### Also included
+
+- **Tag filtering.** Combine tags such as open world, first-person and RPG to
+  find games in your collection.
+- **HowLongToBeat.** See estimated completion times for the main story, extras
+  and completionist runs.
+- **Screenshots and videos.** Browse full-screen screenshots and watch YouTube
+  videos for each game.
+- **Steam game search.** Search the Steam catalog with community tags and sort
+  results by user reviews.
+- **Wishlist.** Save games you'd like to get or import your existing Steam wishlist.
+- **Xbox Game Pass.** Browse games available through Game Pass.
+
+An internet connection is needed to connect accounts, update your collection,
+download game files, watch videos or load media that hasn't been saved yet. Xbox
+games can be collected and browsed; game-file downloads support Steam, GOG and Epic.
+
+## Privacy and security
+
+GameFibre doesn't save your passwords or sign-in codes. To keep accounts connected,
+it stores refresh tokens and account IDs encrypted using Android Keystore. Access
+tokens stay in memory. Your collection and preferences are stored locally; signing
+out removes that store's saved session. Your SteamGridDB API key, if provided, is
+also stored encrypted on your device.
+
+The app uses Google Analytics to measure app openings, with cookies to recognize
+repeat visits. Account IDs, game lists, searches and sign-in details are not passed
+to Analytics. Google signals and ad personalization signals are disabled.
+
+---
+
+## Build from source
+
+Use JDK 21 and the Android SDK with platform 36 and build-tools 35.0.0. After
+cloning the repository, generate the bundled game data and build a debug APK:
+
+```sh
+python3 scripts/update-bundled-data.py --cache-dir .cache/bundled-data
+./gradlew :app:assembleDebug
+```
+
+The APK is written to `app/build/outputs/apk/debug/app-debug.apk`. The debug app
+installs alongside the production app and uses separate local data.
+
+Run the Android checks with:
+
+```sh
+./gradlew :app:testDebugUnitTest :app:lintDebug
+```
+
+For the shared artwork preparation and display rules, see
+[the asset architecture](docs/asset-architecture.md).
 
 ## Updating bundled game data
 
