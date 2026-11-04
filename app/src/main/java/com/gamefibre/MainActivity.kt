@@ -770,7 +770,12 @@ class MainActivity : AppCompatActivity() {
             val storeSearch = if (tab == "store") ensureStoreSearch() else null
             val searchQuery = storeSearch?.queryText ?: query
             val search = ui.row().apply { background = ui.shape(ui.surface, 24) }
-            val input = ui.input(if (storeSearch != null) "Search Steam games" else "Search your collection").apply { background = null; setText(searchQuery) }
+            val searchHint = when {
+                storeSearch != null -> "Search Steam games"
+                collection.list.isEmpty() || collection.list == "All games" -> "Search your collection"
+                else -> "Search ${collection.list}"
+            }
+            val input = ui.input(searchHint).apply { background = null; setText(searchQuery) }
             search.addView(input, LinearLayout.LayoutParams(0, ui.dp(48), 1f))
             searchGameCount = ui.text("0", 12, ui.secondary).apply {
                 isSingleLine = true

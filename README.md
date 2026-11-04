@@ -13,6 +13,8 @@
 All your Steam, GOG, Epic and Xbox games in one beautiful, lightweight Android app.
 Made for browsing, rediscovering, and enjoying the games you own.
 
+***Disclosure**: GameFibre was built with AI. After 27 years in software development, I am enjoying this new way of crafting things!*
+
 <p align="center">
   <a href="https://github.com/mrtnkl/gamefibre/releases/latest"><strong>Download the latest APK</strong></a>
   &nbsp;·&nbsp;
