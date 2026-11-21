@@ -2,6 +2,8 @@ package com.gamefibre.stores
 
 import android.content.Context
 import android.util.AtomicFile
+import com.gamefibre.LibraryStore
+import com.gamefibre.WishlistItems
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -184,8 +186,14 @@ internal class StoreAccounts internal constructor(private val context: Context) 
         }
         check(saved.getString("owner") == owner)
         val games = saved.getJSONArray("games")
+        val libraryStore = when (store) {
+            GameStore.GOG -> LibraryStore.GOG
+            GameStore.EPIC -> LibraryStore.EPIC
+            GameStore.XBOX -> LibraryStore.XBOX
+        }
         (0 until games.length()).map { i -> games.getJSONObject(i).let { StoreGame(it.getString("id"), it.getString("name"), it.optString("namespace"), it.optString("catalogId"), it.optString("imageUrl"), com.gamefibre.GameDetails.read(it.optJSONObject("details")),
             if (store == GameStore.XBOX) XboxAccess.valueOf(it.getString("xboxAccess")) else null) } }
+            .filter { WishlistItems.validId(libraryStore, it.id) }
     }.getOrNull()
 
     private fun saveLibrary(store: GameStore, owner: String, games: List<StoreGame>) {

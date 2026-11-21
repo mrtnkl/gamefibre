@@ -109,6 +109,17 @@ class AssetStoreTest {
         assertEquals("After", store.games().single().game.name)
     }
 
+    @Test fun unreadableRowsAreSkippedInsteadOfFailingTheWholeLibrary() {
+        store.stage(game(LibraryStore.GOG, "1"), "reader", "g1", "r1", 2, false)
+        val broken = """{"store":"EPIC","id":"bad id","name":"Broken","artwork":"","details":{},"steam":null,"namespace":"","catalogId":"","xboxAccess":null}"""
+        store.writableDatabase.execSQL(
+            "INSERT INTO games(key,scope,candidate,group_id,fingerprint) VALUES(?,?,?,?,?)",
+            arrayOf<Any>("EPIC:bad id", "reader", broken, "g2", "r2"))
+        assertEquals(listOf("GOG:1"), store.games().map { it.game.key })
+        assertNull(store.candidate("EPIC:bad id"))
+        assertNull(store.row("EPIC:bad id"))
+    }
+
     /** Distinct dimensions give distinct content-addressed blobs under Robolectric's bitmap shadows. */
     private fun writeImage(seed: Int): String {
         val image = android.graphics.Bitmap.createBitmap(32 + seed, 48 + seed, android.graphics.Bitmap.Config.ARGB_8888)

@@ -43,6 +43,17 @@ class WishlistTest {
         assertNull(gog.remote!!.xboxAccess)
     }
 
+    @Test fun epicSlugsMayContainPeriodsButUnsafeIdentitiesStayRejected() {
+        val epic = game("UE_5.0", LibraryStore.EPIC)
+        assertEquals("UE_5.0", WishlistItems.read(JSONArray().put(WishlistItems.json(epic))).single().id)
+        assertThrows(IllegalArgumentException::class.java) {
+            WishlistItems.read(JSONArray().put(WishlistItems.json(epic.copy(id = "../bad"))))
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            WishlistItems.read(JSONArray().put(WishlistItems.json(epic.copy(id = "a b"))))
+        }
+    }
+
     @Test fun signOutKeepsLocalWishlistSelections() {
         val prefs = testPreferences()
         val collection = CollectionData(prefs)
