@@ -2,6 +2,8 @@ package com.gamefibre.stores
 
 import android.net.Uri
 import com.gamefibre.GameDetails
+import com.gamefibre.LibraryStore
+import com.gamefibre.WishlistItems
 import android.util.Base64
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -102,7 +104,7 @@ internal object StoreApi {
             for (index in 0 until items.length()) {
                 val game = items.getJSONObject(index)
                 val id = game.optString("appName")
-                if (id.isNotBlank() && game.optString("namespace") != "ue" && game.optString("sandboxType") != "PRIVATE") records[id] = game
+                if (id.isNotBlank() && WishlistItems.validId(LibraryStore.EPIC, id) && game.optString("namespace") != "ue" && game.optString("sandboxType") != "PRIVATE") records[id] = game
             }
             cursor = result.optJSONObject("responseMetadata")?.optString("nextCursor")?.takeIf { it.isNotBlank() && it != "null" }
             check(cursor == null || (cursors.size < 1000 && cursors.add(cursor))) { "The store returned an invalid library page." }

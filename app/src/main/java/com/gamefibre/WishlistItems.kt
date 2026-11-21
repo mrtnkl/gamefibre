@@ -10,6 +10,14 @@ internal object WishlistItems {
     const val LIST = "Wishlist"
     const val MAX_ITEMS = 5000
 
+    /** Epic app names are UUIDs or slugs; some contain a period (for example UE_5.0). */
+    fun validId(store: LibraryStore, id: String): Boolean = when (store) {
+        LibraryStore.STEAM -> id.toIntOrNull()?.let { it > 0 } == true
+        LibraryStore.GOG -> id.matches(Regex("[0-9]{1,20}"))
+        LibraryStore.XBOX -> com.gamefibre.stores.xboxProductId(id)
+        LibraryStore.EPIC -> id.matches(Regex("[A-Za-z0-9._-]{1,128}"))
+    }
+
     fun imageUrl(value: String): String = runCatching {
         val uri = URI(value)
         value.takeIf { uri.scheme == "https" && uri.userInfo == null && uri.port == -1 &&
@@ -27,12 +35,7 @@ internal object WishlistItems {
             val row = rows.getJSONObject(index)
             val store = LibraryStore.valueOf(row.getString("store"))
             val id = row.getString("id")
-            require(when (store) {
-                LibraryStore.STEAM -> id.toIntOrNull()?.let { it > 0 } == true
-                LibraryStore.GOG -> id.matches(Regex("[0-9]{1,20}"))
-                LibraryStore.XBOX -> com.gamefibre.stores.xboxProductId(id)
-                LibraryStore.EPIC -> id.matches(Regex("[A-Za-z0-9_-]{1,128}"))
-            }) { "Invalid wishlist game identity." }
+            require(validId(store, id)) { "Invalid wishlist game identity." }
             val name = row.getString("name")
             require(name.isNotBlank() && name.length <= 512 && name.none(Char::isISOControl)) { "Invalid wishlist title." }
             LibraryEntry(store, id, name, remote = StoreGame(id, name,
