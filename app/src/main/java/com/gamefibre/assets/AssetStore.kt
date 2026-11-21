@@ -49,6 +49,11 @@ internal class AssetStore(context: Context, databaseName: String = "library-asse
         parsed[key]?.let { if (it.first == json) return it.second }
         return LibraryRecords.read(JSONArray().put(JSONObject(json))).single().also { parsed[key] = json to it }
     }
+    /** One unreadable record must not take the whole library down. */
+    private fun entryOrNull(key: String, json: String): LibraryEntry? =
+        runCatching { entry(key, json) }.onFailure { error ->
+            android.util.Log.w("AssetStore", "Skipping unreadable game $key: ${error.message}")
+        }.getOrNull()
     /** Run several staging writes as one commit. Do not call publish() inside: it returns false without marking success. */
     fun <T> transaction(block: () -> T): T {
         val db = writableDatabase
@@ -60,7 +65,7 @@ internal class AssetStore(context: Context, databaseName: String = "library-asse
         buildList {
             while (rows.moveToNext()) {
                 val key = rows.getString(0)
-                val game = entry(key, rows.getString(2))
+                val game = entryOrNull(key, rows.getString(2)) ?: continue
                 val group = rows.getString(3)
                 val selected = if (rows.isNull(6)) null else SelectedAsset(group, rows.getString(6), rows.getString(7), rows.getString(8))
                     .takeIf { asset -> present.getOrPut(asset.blob) { blob(asset.blob).isFile } }
@@ -78,7 +83,7 @@ internal class AssetStore(context: Context, databaseName: String = "library-asse
         })
     }
     fun candidate(key: String): LibraryEntry? = readableDatabase.rawQuery("SELECT candidate FROM games WHERE key=?", arrayOf(key)).use {
-        if (!it.moveToFirst()) null else entry(key, it.getString(0))
+        if (!it.moveToFirst()) null else entryOrNull(key, it.getString(0))
     }
     fun stage(game: LibraryEntry, scope: String, group: String, fingerprint: String, priority: Int, refresh: Boolean) {
         val db = writableDatabase
@@ -141,7 +146,9 @@ internal class AssetStore(context: Context, databaseName: String = "library-asse
         buildList { while(it.moveToNext()) add(Job(it.getString(0),it.getInt(1),it.getString(2))) }
     }
     fun row(key: String): StoredGame? = readableDatabase.rawQuery("SELECT scope,COALESCE(published,candidate),group_id,fingerprint,failure FROM games WHERE key=?", arrayOf(key)).use {
-        if(!it.moveToFirst()) null else StoredGame(it.getString(0),entry(key,it.getString(1)),it.getString(2),it.getString(3),selection(it.getString(2)),it.getString(4))
+        if(!it.moveToFirst()) null else entryOrNull(key,it.getString(1))?.let { game ->
+            StoredGame(it.getString(0),game,it.getString(2),it.getString(3),selection(it.getString(2)),it.getString(4))
+        }
     }
     fun nextWorkAt():Long?=readableDatabase.rawQuery("SELECT MIN(MAX(next_at,lease)) FROM jobs",null).use {
         it.moveToFirst();if(it.isNull(0))null else it.getLong(0)
@@ -196,7 +203,7 @@ internal class AssetStore(context: Context, databaseName: String = "library-asse
         }
     }
     fun groupCandidates(group:String):List<LibraryEntry> = readableDatabase.rawQuery("SELECT key,candidate FROM games WHERE group_id=?",arrayOf(group)).use { cursor ->
-        buildList { while(cursor.moveToNext())add(entry(cursor.getString(0),cursor.getString(1))) }
+        buildList { while(cursor.moveToNext())entryOrNull(cursor.getString(0),cursor.getString(1))?.let(::add) }
     }
     fun repair(blob:String) {
         val db=writableDatabase;db.beginTransaction()
